@@ -1,0 +1,140 @@
+[gd_scene load_steps=19 format=3 uid="uid://l7pxugqn1qq1"]
+
+[ext_resource type="Script" path="res://scn.gd" id="1_mamcb"]
+[ext_resource type="Script" path="res://NUMA/Machine.gd" id="2_2nbhc"]
+[ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_2y7ip"]
+[ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="4_xyneb"]
+[ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_02rrj"]
+[ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="5_5k5kc"]
+[ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="6_2ro7u"]
+[ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_urrk8"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_8s6io"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jqlle"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7p21f"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_vggpr"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_twyya"]
+
+[sub_resource type="Animation" id="Animation_wl851"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Chuck/MeshInstance3D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.893934, 3.14159, 1.5708)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_d2auy"]
+_data = {
+"RESET": SubResource("Animation_wl851")
+}
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_73eiv"]
+
+[sub_resource type="Sky" id="Sky_k5ex8"]
+sky_material = SubResource("ProceduralSkyMaterial_73eiv")
+
+[sub_resource type="Environment" id="Environment_8qcfe"]
+background_mode = 2
+sky = SubResource("Sky_k5ex8")
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_mamcb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.36116, 0, 1.86893)
+mesh = SubResource("BoxMesh_8s6io")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-0.4, 0.4, 0.12186, 0.500165, -0.88104, 0.5, -0.88104, 0.29639, -0.37044, 0.29639)
+polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
+
+[node name="Polygon2D2" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-0.4, 0.4, 0.3964, 0.55286, 0.3964, 0.70361, -0.88104, 0.70361, -0.88104, 0.29639, -0.37044, 0.29639)
+polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
+
+[node name="Polygon2D3" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-0.4, 0.4, -0.304405, 0.0649558, 0.985035, 0.31246, 1.23608, 0.513068, 0.88944, 0.647504, -0.4, 0.4)
+polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.91991, -0.0054704, 0)
+polygon = PackedVector2Array(-0.88104, 0.5, 0.00406122, 0.500106, 0.3964, 0.56542, 0.3964, 0.70361, -0.88104, 0.70361, -0.88104, 0.5)
+depth = 0.01
+
+[node name="Machine" type="Node3D" parent="." node_paths=PackedStringArray("machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
+script = ExtResource("2_2nbhc")
+machine_mesh_instance = NodePath("MeshInstance3D")
+control_unit = NodePath("LatheControlUnit")
+machine_zero_point = NodePath("Node3D")
+reference_point = NodePath("Node3D2")
+chuck = NodePath("Chuck")
+tool = NodePath("Tool")
+
+[node name="LatheControlUnit" type="Node" parent="Machine"]
+script = ExtResource("4_xyneb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Machine"]
+mesh = SubResource("PlaneMesh_jqlle")
+
+[node name="Node3D" type="Node3D" parent="Machine"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -1, 0, 0)
+
+[node name="Node3D2" type="Node3D" parent="Machine"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+
+[node name="Chuck" type="Node" parent="Machine" node_paths=PackedStringArray("chuck_mesh_instance", "processed_part")]
+script = ExtResource("4_2y7ip")
+chuck_mesh_instance = NodePath("MeshInstance3D")
+processed_part = NodePath("MeshInstance3D/MeshInstance3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Machine/Chuck"]
+transform = Transform3D(1.64371e-06, 0.117657, 1.58791e-06, 0.62635, -2.66773e-07, 0.779542, 0.779542, -3.37384e-08, -0.62635, -1, 0.5, 0)
+mesh = SubResource("CylinderMesh_7p21f")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Machine/Chuck/MeshInstance3D"]
+transform = Transform3D(0.407242, -1.24345e-14, 2.11758e-22, 9.9476e-14, 5.42869, 5.68434e-14, -2.11758e-21, -3.55271e-14, 0.407242, 2.98023e-08, 6.43976, -6.74154e-08)
+mesh = SubResource("CylinderMesh_vggpr")
+
+[node name="Tool" type="Node" parent="Machine" node_paths=PackedStringArray("tool_mesh_instance", "tool_edge")]
+script = ExtResource("5_02rrj")
+tool_mesh_instance = NodePath("MeshInstance3D")
+tool_edge = NodePath("MeshInstance3D/Node3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Machine/Tool"]
+transform = Transform3D(0.25105, -0.22112, 0, 0.22112, 0.25105, 0, 0, 0, 0.334545, 1, 0.5, 0)
+mesh = SubResource("PrismMesh_twyya")
+
+[node name="Node3D" type="Node3D" parent="Machine/Tool/MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="SimulationAnimation" type="AnimationPlayer" parent="Machine" node_paths=PackedStringArray("machine")]
+libraries = {
+"": SubResource("AnimationLibrary_d2auy"),
+"ALOBRE": ExtResource("6_urrk8")
+}
+script = ExtResource("6_2ro7u")
+machine = NodePath("..")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.15147)
+script = ExtResource("5_5k5kc")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+visible = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_8qcfe")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.532842, 0.476635, 0.699213, -0.0914317, -0.789018, 0.607529, 0.841261, -0.387647, -0.376842, 3.23671, 3.83109, -2.02095)

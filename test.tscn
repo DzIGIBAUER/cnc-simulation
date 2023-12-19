@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3 uid="uid://bdrn2c5rsi5vk"]
+
+[ext_resource type="Script" path="res://test.gd" id="1_cwstx"]
+[ext_resource type="Shader" path="res://test.gdshader" id="2_ddn3n"]
+
+[sub_resource type="Animation" id="Animation_8djs6"]
+length = 1.2
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_27uol"]
+_data = {
+"RESET": SubResource("Animation_8djs6")
+}
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jakn1"]
+render_priority = 0
+shader = ExtResource("2_ddn3n")
+shader_parameter/tool_pos = Vector3(0, -0.64, 0)
+shader_parameter/retreat_position = null
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wua7y"]
+material = SubResource("ShaderMaterial_jakn1")
+
+[node name="Node2D" type="Node3D"]
+script = ExtResource("1_cwstx")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_27uol")
+}
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wua7y")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.905018, -0.0587427, 0.421298, 0.0200402, 0.995207, 0.0957148, -0.424901, -0.0781807, 0.901857, 1.67676, 1.77896, 4.91207)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.843479, 0.094054, -0.528865, 0.0630121, 0.96043, 0.271301, 0.533454, -0.262162, 0.804175, -6.33167, 3.06253, 8.21873)

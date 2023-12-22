@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://l7pxugqn1qq1"]
+[gd_scene load_steps=20 format=3 uid="uid://l7pxugqn1qq1"]
 
 [ext_resource type="Script" path="res://scn.gd" id="1_mamcb"]
 [ext_resource type="Script" path="res://NUMA/Machine.gd" id="2_2nbhc"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="5_5k5kc"]
 [ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="6_2ro7u"]
 [ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_urrk8"]
+[ext_resource type="PackedScene" uid="uid://baabchr6uwr3k" path="res://UI/debug_window/debug_window.tscn" id="9_el36o"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_8s6io"]
 
@@ -56,14 +57,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.36116, 0, 1.86893)
 mesh = SubResource("BoxMesh_8s6io")
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
+visible = false
 polygon = PackedVector2Array(-0.4, 0.4, 0.12186, 0.500165, -0.88104, 0.5, -0.88104, 0.29639, -0.37044, 0.29639)
 polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
 
 [node name="Polygon2D2" type="Polygon2D" parent="."]
+visible = false
 polygon = PackedVector2Array(-0.4, 0.4, 0.3964, 0.55286, 0.3964, 0.70361, -0.88104, 0.70361, -0.88104, 0.29639, -0.37044, 0.29639)
 polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
 
 [node name="Polygon2D3" type="Polygon2D" parent="."]
+visible = false
 polygon = PackedVector2Array(-0.4, 0.4, -0.304405, 0.0649558, 0.985035, 0.31246, 1.23608, 0.513068, 0.88944, 0.647504, -0.4, 0.4)
 polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
 
@@ -132,9 +136,12 @@ script = ExtResource("5_5k5kc")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
+offset = Vector2(580, 320)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_8qcfe")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.532842, 0.476635, 0.699213, -0.0914317, -0.789018, 0.607529, 0.841261, -0.387647, -0.376842, 3.23671, 3.83109, -2.02095)
+
+[node name="DebugWindow" parent="." instance=ExtResource("9_el36o")]

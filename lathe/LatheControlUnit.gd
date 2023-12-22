@@ -118,7 +118,15 @@ class G00 extends Function:
 		var ts = machine.to_local(move_from - machine.tool.offset)
 		var te = machine.to_local(move_to - machine.tool.offset)
 
-		var results = Simulation.calculate_linear_interpolation_result_part(machine, ts, te)
+		var results: Array = Simulation.calculate_linear_interpolation_result_part(machine, ts, te)
+
+		var dw: DebugWindow = machine.get_node("../DebugWindow")
+		
+		for i in range(1, 4):
+				var item = DebugItem.new()
+				item.polygons = [results[i]]
+
+				dw.add_debug_item(str(block), item)
 
 		print(ts, te)
 

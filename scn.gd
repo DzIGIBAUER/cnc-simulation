@@ -4,9 +4,13 @@ extends Node3D
 @onready var poly2: Polygon2D = get_node("Polygon2D2")
 @onready var poly3: Polygon2D = get_node("Polygon2D3")
 
+func _process(delta):
+	if Input.is_action_just_released("ui_cancel"):
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED else Input.MOUSE_MODE_VISIBLE
+		$DebugWindow.visible = !$DebugWindow.visible
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 	# var msh = $Machine/Chuck/MeshInstance3D/MeshInstance3D
 

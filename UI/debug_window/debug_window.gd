@@ -24,6 +24,14 @@ func add_debug_item(
 			polygon_node.vertex_colors = PackedColorArray(range(poly.size()).map(func(_n): return Color.from_hsv(randf(), randf(), randf())))
 
 			node_2d.add_child(polygon_node)
+			for p in poly:
+				var mesh_node = MeshInstance2D.new()
+				var mesh = CapsuleMesh.new()
+				mesh.height = 0.05
+				mesh_node.mesh = mesh
+				mesh_node.position = p
+				
+				node_2d.add_child(mesh_node)
 
 	$HBoxContainer/VBoxContainer/SubViewportContainer/SubViewport.add_child(node_2d)
 

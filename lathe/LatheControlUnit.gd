@@ -118,19 +118,27 @@ class G00 extends Function:
 		var ts = machine.to_local(move_from - machine.tool.offset)
 		var te = machine.to_local(move_to - machine.tool.offset)
 
-		var results: Array = Simulation.calculate_linear_interpolation_result_part(machine, ts, te)
+		var results: Array = Simulation.calculate_lathe_linear_interpolation_result_part(machine, ts, te)
 
 		var dw: DebugWindow = machine.get_node("../DebugWindow")
 		
-		for i in range(1, 4):
-				var item = DebugItem.new()
-				item.polygons = [results[i]]
+		# for i in range(1, 4):
 
-				dw.add_debug_item(str(block), item)
+		var item = DebugItem.new()
+		item.polygons = [results[1]]
+		dw.add_debug_item("%s result" % block.params.get("N"), item)
+		
+		item = DebugItem.new()
+		item.polygons = [results[2]]
+		dw.add_debug_item("%s clipped_part" % block.params.get("N"), item)
 
-		print(ts, te)
+		item = DebugItem.new()
+		item.polygons = [results[3]]
+		dw.add_debug_item("%s part_poly" % block.params.get("N"), item)
 
-		machine.chuck.processed_part.mesh = results[0]
+		# print(ts, te)
+
+		# machine.chuck.processed_part.mesh = results[0]
 		machine.tool.tool_mesh_instance.position = move_to
 
 		sim_anim.animation.track_insert_key(sim_anim.Tracks.PART, start_time, machine.chuck.processed_part.mesh, 0)

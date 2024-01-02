@@ -3,10 +3,15 @@ extends Object
 
 ## Helper simulation functions
 
-static func calculate_linear_interpolation_result_part(machine: Machine, tool_start: Vector3, tool_end: Vector3):
+## mirror the tool and then do the difference and half of the result
+## the difference is for another calculation run
+
+static func calculate_lathe_linear_interpolation_result_part(machine: Machine, tool_start: Vector3, tool_end: Vector3):
 	# tacka gde je zakacen pripremak u koord masine
 	var fix_point = machine.chuck.chuck_mesh_instance.position
 	fix_point = Vector2(fix_point.x, fix_point.y)
+
+	var dw: DebugWindow = machine.get_node("../DebugWindow")
 
 	var tool_start_2d = Vector2(tool_start.x, tool_start.y)
 	var tool_end_2d = Vector2(tool_end.x, tool_end.y)
@@ -15,9 +20,15 @@ static func calculate_linear_interpolation_result_part(machine: Machine, tool_st
 
 	if tool_end_2d.distance_squared_to(fix_point) < tool_start_2d.distance_squared_to(fix_point):
 		closer_point = tool_end_2d
-
-	var flat_part = projected(machine, machine.chuck.processed_part)
-	var flat_tool = projected(machine, machine.tool.tool_mesh_instance)
+	
+	var flat_part: PackedVector3Array
+	
+	if machine.has_meta("result_part_poly"):
+		flat_part = machine.get_meta("result_part_poly")
+	else:
+		flat_part = projected(machine, machine.chuck.processed_part, machine.chuck.processed_part.mesh)
+	
+	var flat_tool = projected(machine, machine.tool.tool_mesh_instance, machine.tool.tool_mesh_instance.mesh)
 
 	var part_poly = PackedVector2Array()
 	for v in flat_part:
@@ -30,25 +41,45 @@ static func calculate_linear_interpolation_result_part(machine: Machine, tool_st
 	tool_poly = Geometry2D.convex_hull(tool_poly)
 
 	var extruded_tool_poly = extrude(tool_poly, 0, tool_end_2d)
+
+	# take extruded tool poly and mirror it around the line at fix point height
+	
+	var mirrored_extruded_tool_poly = PackedVector2Array()
+	for p in extruded_tool_poly:
+		p.y = fix_point.y - ( p.y - fix_point.y )
+		mirrored_extruded_tool_poly.append(p)
+	
 	var clipped_part = Geometry2D.clip_polygons(part_poly, extruded_tool_poly)[0]
+	clipped_part = Geometry2D.clip_polygons(clipped_part, mirrored_extruded_tool_poly)[0]
+	
+	var item = DebugItem.new()
+	item.polygons = [extruded_tool_poly, mirrored_extruded_tool_poly]
+	dw.add_debug_item("Mirrored tool bre", item)
+	
+	item = DebugItem.new()
+	item.polygons = [clipped_part]
+	dw.add_debug_item("Clipped new", item)
 
 	var result
 	if closer_point.y > fix_point.y:
 		result = cutoff_part(clipped_part, fix_point, true)
 	else:
 		result = cutoff_part(clipped_part, fix_point, false)
+	
+	machine.set_meta("result_part_poly", flat_part)
+	machine.set_meta("tool_mesh_position", flat_part)
 
-	return [extrudePartPolygon(machine, result, Vector3.DOWN, Vector3.UP), result, clipped_part, extruded_tool_poly]
+	return [extrudePartPolygon(machine, result, Vector3.DOWN, Vector3.UP), result, clipped_part, part_poly]
 
-# returns verticies in machine coordinates
-static func projected(machine: Machine, mesh_instance: MeshInstance3D) -> PackedVector3Array:
+# returns vertices in machine coordinates
+static func projected(machine: Machine, node: Node3D, mesh: Mesh) -> PackedVector3Array:
 	var arr_mesh: ArrayMesh
 
-	if mesh_instance.mesh is ArrayMesh:
-		arr_mesh = mesh_instance.mesh
+	if mesh is ArrayMesh:
+		arr_mesh = mesh
 	else:
 		arr_mesh = ArrayMesh.new()
-		arr_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_instance.mesh.get_mesh_arrays())
+		arr_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh.get_mesh_arrays())
 
 	var mdt = MeshDataTool.new()
 	mdt.create_from_surface(arr_mesh, 0)
@@ -60,7 +91,7 @@ static func projected(machine: Machine, mesh_instance: MeshInstance3D) -> Packed
 
 	for i in range(mdt.get_vertex_count()):
 		# transform to machine coordinate system so we get rid of the Z axis
-		var vertex = machine.to_local(mesh_instance.to_global(mdt.get_vertex(i)))
+		var vertex = machine.to_local(node.to_global(mdt.get_vertex(i)))
 		
 		var result = vertex
 
@@ -110,7 +141,7 @@ static func cutoff_part(polygon: PackedVector2Array, fix_point: Vector2, upper =
 			half_poly.append(p)
 
 	# Geometry2D.convex_hull cant be used because it will return polygon that doesnt
-	# necessary include all polygons, only those that construct a polygon that containts them all withing it
+	# necessary include all polygons, only those that construct a polygon that contains them all withing it
 	return half_poly
 
 

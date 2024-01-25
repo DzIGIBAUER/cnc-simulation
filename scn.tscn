@@ -1,7 +1,8 @@
-[gd_scene load_steps=20 format=3 uid="uid://l7pxugqn1qq1"]
+[gd_scene load_steps=21 format=3 uid="uid://l7pxugqn1qq1"]
 
 [ext_resource type="Script" path="res://scn.gd" id="1_mamcb"]
 [ext_resource type="Script" path="res://NUMA/Machine.gd" id="2_2nbhc"]
+[ext_resource type="Script" path="res://lathe/LatheSimulationEnvironment.gd" id="3_podgh"]
 [ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_2y7ip"]
 [ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="4_xyneb"]
 [ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_02rrj"]
@@ -76,14 +77,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.91991, -0.0054704, 0)
 polygon = PackedVector2Array(-0.88104, 0.5, 0.00406122, 0.500106, 0.3964, 0.56542, 0.3964, 0.70361, -0.88104, 0.70361, -0.88104, 0.5)
 depth = 0.01
 
-[node name="Machine" type="Node3D" parent="." node_paths=PackedStringArray("machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
+[node name="Machine" type="Node3D" parent="." node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
 script = ExtResource("2_2nbhc")
+simulation_environment = NodePath("Node2D")
 machine_mesh_instance = NodePath("MeshInstance3D")
 control_unit = NodePath("LatheControlUnit")
 machine_zero_point = NodePath("Node3D")
 reference_point = NodePath("Node3D2")
 chuck = NodePath("Chuck")
 tool = NodePath("Tool")
+
+[node name="Node2D" type="Node2D" parent="Machine"]
+visible = false
+position = Vector2(300, 300)
+scale = Vector2(200, 200)
+script = ExtResource("3_podgh")
 
 [node name="LatheControlUnit" type="Node" parent="Machine"]
 script = ExtResource("4_xyneb")

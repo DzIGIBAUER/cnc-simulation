@@ -6,6 +6,8 @@ signal function_called(machine: Machine, function_name: String, block: Dictionar
 
 signal on_state_set(function: ControlUnit.Function)
 
+# this may need to change if we ever create mill machine
+@export var simulation_environment: Node2D
 @export var machine_mesh_instance: Node
 @export var control_unit: ControlUnit
 

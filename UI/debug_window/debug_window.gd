@@ -4,7 +4,6 @@ class_name DebugWindow
 
 var item_node_mapping = {}
 
-
 func add_debug_item(
 	title: String,
 	item: DebugItem
@@ -24,6 +23,8 @@ func add_debug_item(
 			polygon_node.vertex_colors = PackedColorArray(range(poly.size()).map(func(_n): return Color.from_hsv(randf(), randf(), randf())))
 
 			node_2d.add_child(polygon_node)
+
+			# add point for every vertex
 			for p in poly:
 				var mesh_node = MeshInstance2D.new()
 				var mesh = CapsuleMesh.new()

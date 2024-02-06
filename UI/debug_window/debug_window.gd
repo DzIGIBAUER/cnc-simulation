@@ -28,7 +28,7 @@ func add_debug_item(
 			for p in poly:
 				var mesh_node = MeshInstance2D.new()
 				var mesh = CapsuleMesh.new()
-				mesh.height = 0.05
+				mesh.height = 0.02
 				mesh_node.mesh = mesh
 				mesh_node.position = p
 				

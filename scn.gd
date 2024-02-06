@@ -61,8 +61,12 @@ func _ready():
 	# msh.mesh = Simulation.extrudeAround(poly.polygon, Vector3.DOWN, Vector3.UP)
 	
 	var masina: Machine = $Machine
-	masina.load_gcode("M03 S500\nG00 X40 Z100\nG00 X40 Z60\nG00 X30 Z60")
-	masina.run()
+	# masina.load_gcode("M03 S500\nG01 X40 Z100\nG01 X40 Z80\nG02 X0 Z60 R0.4")
+	masina.load_gcode("G01 X40 Z100 F1\nG01 X40 Z80 F1\nG03 X0 Z60 R0.4 F1")
+	if masina.gcode.valid:
+		masina.run()
+	else:
+		print("GCode invalid")
 	
 	# pass
 	# print(masina.control_unit.M03.validate({"M": "03", "S": "800"}))

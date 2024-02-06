@@ -11,7 +11,7 @@ class Function extends RefCounted:
 		self.machine = machine_
 		self.block = block_
 	
-	static func validate(_params: Dictionary) -> bool:
+	static func validate(_block: Block) -> bool:
 		return false
 	
 	func set_state() -> void:
@@ -52,9 +52,9 @@ func parse_gcode(code: String) -> GCode:
 			if not letter in valid_letters():
 				gcode.invalidate(line_num, col, "Letter %s is not a valid letter" % letter)
 			
-			if not number.is_valid_int():
-				gcode.invalidate(line_num, col+1, "Number %s is not a valid function number" % number)
-			
+			if not number.is_valid_float():
+				gcode.invalidate(line_num, col+1, "Number %s is not a valid parameter value" % number)
+
 			if letter in ["G", "M"]:
 				main_function = "%s%s" % [letter, number]
 				if get(main_function) == null:
@@ -71,7 +71,7 @@ func parse_gcode(code: String) -> GCode:
 		
 		var block = Block.new(params)
 		
-		var valid = get(main_function).validate(params)
+		var valid = get(main_function).validate(block)
 		if not valid:
 			gcode.invalidate(line_num, 0, "Wrong parameters")
 

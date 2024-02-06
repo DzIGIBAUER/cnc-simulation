@@ -1,0 +1,129 @@
+[gd_scene load_steps=15 format=3 uid="uid://c2u62iyhm2x81"]
+
+[ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="1_hdo0e"]
+[ext_resource type="Script" path="res://NUMA/Machine.gd" id="1_poxfs"]
+[ext_resource type="Script" path="res://lathe/LatheSimulationEnvironment.gd" id="2_0ku2k"]
+[ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="3_kh7vq"]
+[ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_ltlcw"]
+[ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_2cpmw"]
+[ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_c2qt8"]
+[ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="7_0uhy5"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_3in5y"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_t412k"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_0dkf3"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_n5kgk"]
+
+[sub_resource type="Animation" id="Animation_wl851"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Chuck/MeshInstance3D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.893934, 3.14159, 1.5708)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_d2auy"]
+_data = {
+"RESET": SubResource("Animation_wl851")
+}
+
+[node name="simulation" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1024, 768)
+render_target_update_mode = 4
+
+[node name="Node3D" type="Node3D" parent="SubViewportContainer/SubViewport"]
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36575)
+script = ExtResource("1_hdo0e")
+
+[node name="Machine" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D" node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
+script = ExtResource("1_poxfs")
+simulation_environment = NodePath("Node2D")
+machine_mesh_instance = NodePath("MeshInstance3D")
+control_unit = NodePath("LatheControlUnit")
+machine_zero_point = NodePath("Node3D")
+reference_point = NodePath("Node3D2")
+chuck = NodePath("Chuck")
+tool = NodePath("Tool")
+
+[node name="Node2D" type="Node2D" parent="SubViewportContainer/SubViewport/Node3D/Machine"]
+visible = false
+position = Vector2(300, 300)
+scale = Vector2(200, 200)
+script = ExtResource("2_0ku2k")
+
+[node name="LatheControlUnit" type="Node" parent="SubViewportContainer/SubViewport/Node3D/Machine"]
+script = ExtResource("3_kh7vq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine"]
+mesh = SubResource("PlaneMesh_3in5y")
+
+[node name="Node3D" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D/Machine"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -1, 0, 0)
+
+[node name="Node3D2" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D/Machine"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+
+[node name="Chuck" type="Node" parent="SubViewportContainer/SubViewport/Node3D/Machine" node_paths=PackedStringArray("chuck_mesh_instance", "processed_part")]
+script = ExtResource("4_ltlcw")
+chuck_mesh_instance = NodePath("MeshInstance3D")
+processed_part = NodePath("MeshInstance3D/MeshInstance3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Chuck"]
+transform = Transform3D(1.64371e-06, 0.117657, 1.58791e-06, 0.62635, -2.66773e-07, 0.779542, 0.779542, -3.37384e-08, -0.62635, -1, 0.5, 0)
+mesh = SubResource("BoxMesh_t412k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Chuck/MeshInstance3D"]
+transform = Transform3D(0.407242, -1.24345e-14, 2.11758e-22, 9.9476e-14, 5.42869, 5.68434e-14, -2.11758e-21, -3.55271e-14, 0.407242, 2.98023e-08, 6.43976, -6.74154e-08)
+mesh = SubResource("CylinderMesh_0dkf3")
+
+[node name="Tool" type="Node" parent="SubViewportContainer/SubViewport/Node3D/Machine" node_paths=PackedStringArray("tool_mesh_instance", "tool_edge")]
+script = ExtResource("5_2cpmw")
+tool_mesh_instance = NodePath("MeshInstance3D")
+tool_edge = NodePath("MeshInstance3D/Node3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Tool"]
+transform = Transform3D(0.25105, -0.22112, 0, 0.22112, 0.25105, 0, 0, 0, 0.334545, 1, 0.5, 0)
+mesh = SubResource("PrismMesh_n5kgk")
+
+[node name="Node3D" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Tool/MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="SimulationAnimation" type="AnimationPlayer" parent="SubViewportContainer/SubViewport/Node3D/Machine" node_paths=PackedStringArray("machine")]
+libraries = {
+"": SubResource("AnimationLibrary_d2auy"),
+"ALOBRE": ExtResource("6_c2qt8")
+}
+script = ExtResource("7_0uhy5")
+machine = NodePath("..")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/Node3D"]
+transform = Transform3D(0.96693, -0.127135, 0.221094, 0, 0.866897, 0.498488, -0.255041, -0.482003, 0.838229, 1.42849, 4.42589, 7.44594)

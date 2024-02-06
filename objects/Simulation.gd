@@ -6,7 +6,7 @@ extends Object
 ## mirror the tool and then do the difference and half of the result
 ## the difference is for another calculation run
 
-static func calculate_lathe_linear_interpolation_result_part(machine: Machine, tool_start: Vector3, tool_end: Vector3):
+static func calculate_lathe_linear_interpolation_result_part_df(machine: Machine, tool_start: Vector3, tool_end: Vector3):
 	# tacka gde je zakacen pripremak u koord masine
 	var fix_point = machine.chuck.chuck_mesh_instance.position
 	fix_point = Vector2(fix_point.x, fix_point.y)
@@ -213,9 +213,9 @@ static func extrudePartPolygon(machine: Machine, polygon: PackedVector2Array, po
 			dir = Quaternion(pointA.direction_to(pointB), deg_to_rad(1)) * dir
 			var c1 = dir + pivot
 
-			st.add_triangle_fan(PackedVector3Array([a, c, b]))
+			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]))
 
-			st.add_triangle_fan(PackedVector3Array([c, c1, b]))
+			st.add_triangle_fan(PackedVector3Array([c, c1, b]), PackedVector2Array([Vector2.ONE, Vector2.ONE, Vector2.ZERO]))
 			
 			a = c
 			b = c1

@@ -74,7 +74,7 @@ class M03 extends Function:
 		machine.on_state_set.connect(ost)
 
 
-class IntepolationFunction extends Function:
+class InterpolationFunction extends Function:
 	var last_position: Vector2
 	var simulation_result: LatheSimulationEnvironment.SimulationResult
 
@@ -152,10 +152,10 @@ class IntepolationFunction extends Function:
 		sim_anim.animation.length += length
 
 
-class G00 extends IntepolationFunction: pass
+class G00 extends InterpolationFunction: pass
 
 
-class G01 extends IntepolationFunction:
+class G01 extends InterpolationFunction:
 	static func validate(block_: Block):
 		var f = block_.params.get("F")
 
@@ -167,7 +167,7 @@ class G01 extends IntepolationFunction:
 
 
 
-class G02 extends IntepolationFunction:
+class G02 extends InterpolationFunction:
 	
 	static func validate(block_: Block):
 		var r = block_.params.get("R")

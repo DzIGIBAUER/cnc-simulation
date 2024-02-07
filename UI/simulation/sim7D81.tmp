@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://c2u62iyhm2x81"]
+[gd_scene load_steps=15 format=3 uid="uid://c2u62iyhm2x81"]
 
 [ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="1_hdo0e"]
 [ext_resource type="Script" path="res://lathe/LatheSimulationEnvironment.gd" id="2_0ku2k"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_2cpmw"]
 [ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_c2qt8"]
 [ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="7_0uhy5"]
-[ext_resource type="Shader" path="res://assets/shaders/waste_shrink.gdshader" id="7_mewmu"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_3in5y"]
 
@@ -17,12 +16,6 @@
 [sub_resource type="CylinderMesh" id="CylinderMesh_0dkf3"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_n5kgk"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_foble"]
-render_priority = 0
-shader = ExtResource("7_mewmu")
-shader_parameter/tool_position = null
-shader_parameter/retreat_position = Vector3(0, -1, 0)
 
 [sub_resource type="Animation" id="Animation_wl851"]
 length = 0.001
@@ -115,17 +108,14 @@ mesh = SubResource("CylinderMesh_0dkf3")
 [node name="Tool" type="Node" parent="SubViewportContainer/SubViewport/Node3D/Machine" node_paths=PackedStringArray("tool_mesh_instance", "tool_edge")]
 script = ExtResource("5_2cpmw")
 tool_mesh_instance = NodePath("MeshInstance3D")
-tool_edge = NodePath("MeshInstance3D/Part")
+tool_edge = NodePath("MeshInstance3D/Node3D")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Tool"]
 transform = Transform3D(0.25105, -0.22112, 0, 0.22112, 0.25105, 0, 0, 0, 0.334545, 1, 0.5, 0)
 mesh = SubResource("PrismMesh_n5kgk")
 
-[node name="Part" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Tool/MeshInstance3D"]
+[node name="Node3D" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Tool/MeshInstance3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-
-[node name="Waste" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Tool/MeshInstance3D/Part"]
-material_override = SubResource("ShaderMaterial_foble")
 
 [node name="SimulationAnimation" type="AnimationPlayer" parent="SubViewportContainer/SubViewport/Node3D/Machine" node_paths=PackedStringArray("machine")]
 libraries = {

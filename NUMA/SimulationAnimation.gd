@@ -7,6 +7,7 @@ enum Tracks {
 	CHUCK,
 	TOOL,
 	PART,
+	WASTE,
 }
 
 var animation = Animation.new()
@@ -32,6 +33,9 @@ func _ready():
 	
 	animation.add_track(Animation.TYPE_VALUE, Tracks.PART)
 	animation.track_set_path(Tracks.PART, "%s:mesh" % machine.get_path_to(machine.chuck.processed_part))
+
+	animation.add_track(Animation.TYPE_VALUE, Tracks.WASTE)
+	animation.track_set_path(Tracks.WASTE, "%s:mesh" % machine.get_path_to(machine.chuck.waste))
 
 
 func get_track_last_key_time(track: Tracks) -> float:

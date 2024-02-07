@@ -25,7 +25,11 @@ var gcode: GCode
 
 func _ready():
 	workspace = AABB(machine_zero_point.position, reference_point.position-machine_zero_point.position).abs()
-	
+
+# TODO: don't run this all the time
+func _process(_delta):
+	chuck.waste.material_override.set_shader_parameter("retreat_position", chuck.waste.to_local(chuck.chuck_mesh_instance.global_position))
+	chuck.waste.material_override.set_shader_parameter("tool_position", chuck.waste.to_local(tool.tool_edge.global_position))
 
 func is_point_inside_workspace(point: Vector3) -> bool:
 	return workspace.has_point(point)

@@ -111,9 +111,13 @@ class InterpolationFunction extends Function:
 		simulation_result = machine.simulation_environment.calculate_lathe_linear_interpolation_result(tool_start, tool_end)
 	
 	func animate_part(sim_anim: SimulationAnimation, start_time: float, length: float):
-		if start_time == 0:
-			sim_anim.animation.track_insert_key(sim_anim.Tracks.PART, start_time, machine.chuck.processed_part.mesh, 1)
+		sim_anim.animation.track_insert_key(sim_anim.Tracks.WASTE, start_time, simulation_result.waste_mesh, 0)
+		sim_anim.animation.track_insert_key(sim_anim.Tracks.WASTE, start_time + length, simulation_result.waste_mesh, 0)
 
+		# if start_time == 0:
+		# sim_anim.animation.track_insert_key(sim_anim.Tracks.PART, start_time, machine.chuck.processed_part.mesh, 0)
+
+		sim_anim.animation.track_insert_key(sim_anim.Tracks.PART, start_time, simulation_result.mesh, 0)
 		sim_anim.animation.track_insert_key(sim_anim.Tracks.PART, start_time + length, simulation_result.mesh, 0)
 	
 	func animate_tool(sim_anim: SimulationAnimation, start_time: float, length: float):

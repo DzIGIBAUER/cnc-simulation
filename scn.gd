@@ -60,11 +60,18 @@ func _ready():
 	# msh.mesh = Simulation.extrudeAround(Geometry2D.clip_polygons(poly.polygon, tool_flat)[0], Vector3.DOWN, Vector3.UP)
 	# msh.mesh = Simulation.extrudeAround(poly.polygon, Vector3.DOWN, Vector3.UP)
 	
-	var masina: Machine = $Machine
-	# masina.load_gcode("M03 S500\nG01 X40 Z100\nG01 X40 Z80\nG02 X0 Z60 R0.4")
-	masina.load_gcode("G01 X40 Z100 F1\nG01 X40 Z80 F1\nG03 X0 Z60 R0.4 F1")
-	if masina.gcode.valid:
-		masina.run()
+	var machine: Machine = $Machine
+
+	# var arr_mesh = Simulation.extrudeThreadPolygon(machine, $Polygon2D2.polygon, Vector3.DOWN, Vector3.UP, 0.01)
+	# var arr_mesh2 = Simulation.extrudePartPolygon(machine, machine.simulation_environment.part_polygon_node.polygon, Vector3.DOWN, Vector3.UP)
+
+	# $MeshInstance3D.mesh = arr_mesh
+	# $MeshInstance3D2.mesh = arr_mesh2
+
+	machine.load_gcode("M03 S500\nG01 X40 Z100\nG01 X40 Z80\nG02 X0 Z60 R0.4")
+	machine.load_gcode("G01 X40 Z100 F1\nG01 X40 Z80 F1\nG03 X0 Z60 R0.4 F1")
+	if machine.gcode.valid:
+		machine.run()
 	else:
 		print("GCode invalid")
 	

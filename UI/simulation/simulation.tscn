@@ -1,13 +1,71 @@
 [gd_scene load_steps=15 format=3 uid="uid://c2u62iyhm2x81"]
 
 [ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="1_hdo0e"]
-[ext_resource type="Script" path="res://NUMA/Machine.gd" id="1_poxfs"]
 [ext_resource type="Script" path="res://lathe/LatheSimulationEnvironment.gd" id="2_0ku2k"]
 [ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="3_kh7vq"]
 [ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_ltlcw"]
 [ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_2cpmw"]
 [ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_c2qt8"]
 [ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="7_0uhy5"]
+
+[sub_resource type="GDScript" id="GDScript_apf42"]
+script/source = "class_name Machine
+extends Node3D
+
+## This signal is called after control unit G or M function is called
+signal function_called(machine: Machine, function_name: String, block: Dictionary, duration: float)
+
+signal on_state_set(function: ControlUnit.Function)
+
+# this may need to change if we ever create mill machine
+@export var simulation_environment: Node2D
+@export var machine_mesh_instance: Node
+@export var control_unit: ControlUnit
+
+@export var machine_zero_point: Node3D
+@export var reference_point: Node3D
+
+@export var chuck: Chuck
+@export var tool: Tool
+
+const MAX_TOOL_SPEED = 0.5
+
+var workspace: AABB
+
+var gcode: GCode
+
+func _ready():
+	workspace = AABB(machine_zero_point.position, reference_point.position-machine_zero_point.position).abs()
+	
+
+func is_point_inside_workspace(point: Vector3) -> bool:
+	return workspace.has_point(point)
+
+## Trasform vector3 from machine to workspace coordinate system
+func point_to_workspace(point: Vector3) -> Vector3:
+	return to_global(point) - workspace.position
+
+
+func load_gcode(code: String):
+	gcode = control_unit.parse_gcode(code)
+
+func run():
+	for block in gcode.blocks:
+		var function_name: String
+		
+		if \"G\" in block.params.keys():
+			function_name = \"G\" + block.params[\"G\"]
+		elif \"M\" in block.params.keys():
+			function_name = \"M\" + block.params[\"M\"]
+
+		var function: ControlUnit.Function = control_unit.get(function_name).new(self, block)
+		print(\"function %s takes %s seconds to complete\" % [function_name, function.calculate_duration()])
+		function.set_state()
+		function.animate($SimulationAnimation)
+	
+	$SimulationAnimation.play(\"animation/simulation\")
+
+"
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_3in5y"]
 
@@ -64,15 +122,26 @@ render_target_update_mode = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36575)
 script = ExtResource("1_hdo0e")
 
-[node name="Machine" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D" node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
-script = ExtResource("1_poxfs")
-simulation_environment = NodePath("Node2D")
-machine_mesh_instance = NodePath("MeshInstance3D")
-control_unit = NodePath("LatheControlUnit")
-machine_zero_point = NodePath("Node3D")
-reference_point = NodePath("Node3D2")
-chuck = NodePath("Chuck")
-tool = NodePath("Tool")
+[node name="Machine" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D"]
+script = SubResource("GDScript_apf42")
+simulation_environment = Object(Node2D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":false,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":0,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"position":Vector2(300, 300),"rotation":0.0,"scale":Vector2(200, 200),"skew":0.0,"script":ExtResource("2_0ku2k"))
+
+machine_mesh_instance = Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":null,"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_scale":0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("PlaneMesh_3in5y"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+
+control_unit = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":ExtResource("3_kh7vq"))
+
+machine_zero_point = Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -1, 0, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+
+reference_point = Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+
+chuck = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":ExtResource("4_ltlcw"),"chuck_mesh_instance":Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(1.64371e-06, 0.117657, 1.58791e-06, 0.62635, -2.66773e-07, 0.779542, 0.779542, -3.37384e-08, -0.62635, -1, 0.5, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":null,"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_scale":0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("BoxMesh_t412k"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+,"processed_part":Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(0.407242, -1.24345e-14, 2.11758e-22, 9.9476e-14, 5.42869, 5.68434e-14, -2.11758e-21, -3.55271e-14, 0.407242, 2.98023e-08, 6.43976, -6.74154e-08),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":null,"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_scale":0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("CylinderMesh_0dkf3"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+)
+
+tool = Object(Node,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","script":ExtResource("5_2cpmw"),"tool_mesh_instance":Object(MeshInstance3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(0.25105, -0.22112, 0, 0.22112, 0.25105, 0, 0, 0, 0.334545, 1, 0.5, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"layers":1,"sorting_offset":0.0,"sorting_use_aabb_center":true,"material_override":null,"material_overlay":null,"transparency":0.0,"cast_shadow":1,"extra_cull_margin":0.0,"custom_aabb":AABB(0, 0, 0, 0, 0, 0),"lod_bias":1.0,"ignore_occlusion_culling":false,"gi_mode":1,"gi_lightmap_scale":0,"visibility_range_begin":0.0,"visibility_range_begin_margin":0.0,"visibility_range_end":0.0,"visibility_range_end_margin":0.0,"visibility_range_fade_mode":0,"mesh":SubResource("PrismMesh_n5kgk"),"skin":null,"skeleton":NodePath(".."),"surface_material_override/0":null,"script":null)
+,"tool_edge":Object(Node3D,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","transform":Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0),"rotation_edit_mode":0,"rotation_order":2,"top_level":false,"visible":true,"visibility_parent":NodePath(""),"script":null)
+)
+
 
 [node name="Node2D" type="Node2D" parent="SubViewportContainer/SubViewport/Node3D/Machine"]
 visible = false

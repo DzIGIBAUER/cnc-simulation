@@ -202,7 +202,7 @@ static func extrudePartPolygon(machine: Machine, polygon: PackedVector2Array, po
 		a = machine.chuck.processed_part.to_local(machine.to_global(a))
 		b = machine.chuck.processed_part.to_local(machine.to_global(b))
 		
-		for step in range(360):
+		for j in range(360):
 			var pivot = Geometry3D.get_closest_point_to_segment_uncapped(a, pointA, pointB)
 			var dir = a - pivot
 			dir = Quaternion(pointA.direction_to(pointB), deg_to_rad(1)) * dir
@@ -212,6 +212,46 @@ static func extrudePartPolygon(machine: Machine, polygon: PackedVector2Array, po
 			dir = b - pivot
 			dir = Quaternion(pointA.direction_to(pointB), deg_to_rad(1)) * dir
 			var c1 = dir + pivot
+
+			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]))
+
+			st.add_triangle_fan(PackedVector3Array([c, c1, b]), PackedVector2Array([Vector2.ONE, Vector2.ONE, Vector2.ZERO]))
+			
+			a = c
+			b = c1
+	
+	st.generate_normals()
+	
+	return st.commit()
+
+# same as above but adds step to y axis to look like a thread stuff idk...
+static func extrudeThreadPolygon(machine: Machine, polygon: PackedVector2Array, pointA: Vector3, pointB: Vector3, step: float) -> ArrayMesh:
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(-1)
+
+	for i in range(polygon.size()):
+		# b is either next or first point if we reached the end
+		var second_index = i+1 if i != polygon.size()-1 else 0
+
+		var a = Vector3(polygon[i].x, polygon[i].y, 0)
+		var b = Vector3(polygon[second_index].x, polygon[second_index].y, 0)
+
+		a = machine.chuck.processed_part.to_local(machine.to_global(a))
+		b = machine.chuck.processed_part.to_local(machine.to_global(b))
+		
+		for j in range(360):
+			var pivot = Geometry3D.get_closest_point_to_segment_uncapped(a, pointA, pointB)
+			var dir = a - pivot
+			dir = Quaternion(pointA.direction_to(pointB), deg_to_rad(1)) * dir
+			var c = dir + pivot
+			c.y -= step
+			
+			pivot = Geometry3D.get_closest_point_to_segment_uncapped(b, pointA, pointB)
+			dir = b - pivot
+			dir = Quaternion(pointA.direction_to(pointB), deg_to_rad(1)) * dir
+			var c1 = dir + pivot
+			c1.y -= step
 
 			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]))
 

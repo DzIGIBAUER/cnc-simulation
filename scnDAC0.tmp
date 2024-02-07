@@ -1,7 +1,6 @@
 [gd_scene load_steps=21 format=3 uid="uid://l7pxugqn1qq1"]
 
 [ext_resource type="Script" path="res://scn.gd" id="1_mamcb"]
-[ext_resource type="Script" path="res://NUMA/Machine.gd" id="2_2nbhc"]
 [ext_resource type="Script" path="res://lathe/LatheSimulationEnvironment.gd" id="3_podgh"]
 [ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_2y7ip"]
 [ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="4_xyneb"]
@@ -12,6 +11,65 @@
 [ext_resource type="PackedScene" uid="uid://baabchr6uwr3k" path="res://UI/debug_window/debug_window.tscn" id="9_el36o"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_8s6io"]
+
+[sub_resource type="GDScript" id="GDScript_apf42"]
+script/source = "class_name Machine
+extends Node3D
+
+## This signal is called after control unit G or M function is called
+signal function_called(machine: Machine, function_name: String, block: Dictionary, duration: float)
+
+signal on_state_set(function: ControlUnit.Function)
+
+# this may need to change if we ever create mill machine
+@export var simulation_environment: Node2D
+@export var machine_mesh_instance: Node
+@export var control_unit: ControlUnit
+
+@export var machine_zero_point: Node3D
+@export var reference_point: Node3D
+
+@export var chuck: Chuck
+@export var tool: Tool
+
+const MAX_TOOL_SPEED = 0.5
+
+var workspace: AABB
+
+var gcode: GCode
+
+func _ready():
+	workspace = AABB(machine_zero_point.position, reference_point.position-machine_zero_point.position).abs()
+	
+
+func is_point_inside_workspace(point: Vector3) -> bool:
+	return workspace.has_point(point)
+
+## Trasform vector3 from machine to workspace coordinate system
+func point_to_workspace(point: Vector3) -> Vector3:
+	return to_global(point) - workspace.position
+
+
+func load_gcode(code: String):
+	gcode = control_unit.parse_gcode(code)
+
+func run():
+	for block in gcode.blocks:
+		var function_name: String
+		
+		if \"G\" in block.params.keys():
+			function_name = \"G\" + block.params[\"G\"]
+		elif \"M\" in block.params.keys():
+			function_name = \"M\" + block.params[\"M\"]
+
+		var function: ControlUnit.Function = control_unit.get(function_name).new(self, block)
+		print(\"function %s takes %s seconds to complete\" % [function_name, function.calculate_duration()])
+		function.set_state()
+		function.animate($SimulationAnimation)
+	
+	$SimulationAnimation.play(\"animation/simulation\")
+
+"
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_jqlle"]
 
@@ -54,20 +112,17 @@ sky = SubResource("Sky_k5ex8")
 script = ExtResource("1_mamcb")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -2.52726, 0, 1.22754)
-mesh = SubResource("BoxMesh_8s6io")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, -2.52726, 0, 1.22754)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.52726, 0, 1.22754)
 mesh = SubResource("BoxMesh_8s6io")
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(0, 1, 0.5, 0, -0.5, 0)
+visible = false
+polygon = PackedVector2Array(-0.4, 0.4, 0.12186, 0.500165, -0.88104, 0.5, -0.88104, 0.29639, -0.37044, 0.29639)
 polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
 
 [node name="Polygon2D2" type="Polygon2D" parent="."]
 visible = false
-polygon = PackedVector2Array(0.4, 0, 0, -0.4, -0.4, 0)
+polygon = PackedVector2Array(-0.4, 0.4, 0.3964, 0.55286, 0.3964, 0.70361, -0.88104, 0.70361, -0.88104, 0.29639, -0.37044, 0.29639)
 polygons = [PackedVector2Array(-0.881041, 0.372462, -0.625552, 0.372461, 0.140917, 0.372459, 0.396406, 0.372459, 0.396406, 0.377951, 0.396406, 0.512498, 0.396407, 0.625084, 0.396407, 0.627535, 0.140917, 0.627535, -0.88104, 0.627538, -0.88104, 0.622046, -0.881041, 0.487499, -0.881041, 0.374912, -0.881041, 0.372462), PackedVector2Array(0.88944, 0.625525, 0.985035, 0.263915, 1.23608, 0.485035, 0.88944, 0.625525)]
 
 [node name="Polygon2D3" type="Polygon2D" parent="."]
@@ -81,7 +136,7 @@ polygon = PackedVector2Array(-0.88104, 0.5, 0.00406122, 0.500106, 0.3964, 0.5654
 depth = 0.01
 
 [node name="Machine" type="Node3D" parent="." node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
-script = ExtResource("2_2nbhc")
+script = SubResource("GDScript_apf42")
 simulation_environment = NodePath("Node2D")
 machine_mesh_instance = NodePath("MeshInstance3D")
 control_unit = NodePath("LatheControlUnit")

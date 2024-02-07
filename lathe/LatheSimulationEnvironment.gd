@@ -74,7 +74,7 @@ func calculate_lathe_linear_interpolation_result(tool_start: Vector3, tool_end: 
 			if poly[0].y > clipped_waste[0].y:
 				clipped_waste = poly
 
-	var dw: DebugWindow = machine.get_node("../DebugWindow")
+	var dw = Global.debug_window
 	
 	var item = DebugItem.new()
 	item.polygons = [clipped_part]
@@ -152,7 +152,7 @@ func calculate_lathe_circular_interpolation_result(tool_start: Vector3, tool_end
 	part_polygon_node.polygon = clipped_part
 
 
-	var dw: DebugWindow = machine.get_node("../DebugWindow")
+	var dw = Global.debug_window
 
 	var item = DebugItem.new()
 	item.polygons = [part_polygon_node.polygon, extruded_tool_poly]

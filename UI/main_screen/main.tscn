@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1gdadosflbw5"]
+[gd_scene load_steps=3 format=3 uid="uid://b1gdadosflbw5"]
 
 [ext_resource type="Script" path="res://UI/main_screen/main.gd" id="1_anjr7"]
+[ext_resource type="PackedScene" uid="uid://baabchr6uwr3k" path="res://UI/debug_window/debug_window.tscn" id="2_c61lp"]
 
 [node name="main" type="Control"]
 layout_mode = 3
@@ -30,5 +31,10 @@ G00 X30 Z60"
 [node name="Button" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Start"
+
+[node name="DebugWindow" parent="." instance=ExtResource("2_c61lp")]
+visible = false
+layout_mode = 0
+anchors_preset = 0
 
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]

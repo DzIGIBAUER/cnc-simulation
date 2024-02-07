@@ -4,6 +4,9 @@ class_name DebugWindow
 
 var item_node_mapping = {}
 
+func _ready():
+	Global.debug_window = self
+
 func add_debug_item(
 	title: String,
 	item: DebugItem

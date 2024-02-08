@@ -185,11 +185,14 @@ func calculate_center_point_r(start: Vector2, end: Vector2, radius: float) -> Ve
 	var M = (end-midpoint)
 
 	# var m = M.rotated(deg_to_rad(90 if clockwise else -90))
-	var m = M.rotated(deg_to_rad(90))
+	var m = M.rotated(deg_to_rad(90)) + midpoint
 
-	var d = sqrt(pow(radius, 2) - M.distance_squared_to(end))
+	var d = sqrt(pow(radius, 2) - midpoint.distance_squared_to(end))
 
-	return (Vector2.ZERO.direction_to(m) * d) + midpoint
+	prints(start, end)
+	prints("alo", M, m, d, (Vector2.ZERO.direction_to(m-midpoint)*d)+midpoint )
+
+	return (midpoint + midpoint.direction_to(m)*d)
 
 
 func calculate_circle_points(start: Vector2, end: Vector2, center: Vector2, clockwise: bool = true) -> PackedVector2Array:

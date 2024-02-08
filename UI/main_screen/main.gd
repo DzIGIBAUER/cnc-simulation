@@ -16,5 +16,5 @@ func _on_button_pressed():
 
 	var masina: Machine = simulation_scene.get_node("SubViewportContainer/SubViewport/Node3D/Machine")
 
-	masina.load_gcode($VBoxContainer/CodeEdit.text)
+	masina.load_gcode($VBoxContainer/GCodeEdit.text)
 	masina.run()

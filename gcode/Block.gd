@@ -15,8 +15,13 @@ var params: Dictionary
 func _init(params_: Dictionary):
 	params = params_
 
-func get_param(param_name: String, keep_string = false) -> float:
-	return params.get(param_name) if keep_string else float(params.get(param_name))
+## Gets the parameter value. Raises and error if parameter key doesn't exist.
+## Check if the parameter exists [code]if "X" in block.parameters:[/code]
+func get_param(param_name: String) -> float:
+	if not param_name in params:
+		push_error("Tried to get parameter %s from parameters where it doesn't exist." % [param_name])
+
+	return float(params.get(param_name))
 
 func _to_string():
 	return "Block: %s" % params

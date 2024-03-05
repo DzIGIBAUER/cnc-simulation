@@ -9,7 +9,8 @@ func valid_letters() -> Array[String]:
 		"S",
 		"X",
 		"Z",
-		"R"
+		"R",
+		"P",
 	]
 
 class M03 extends Function:
@@ -90,15 +91,15 @@ class InterpolationFunction extends Function:
 	func set_state():
 		super()
 
-		var x = block.get_param("X") / 100.0
-		var z = block.get_param("Z") / 100.0
+		var x = machine.control_unit.convert2mm(block.get_param("X") / 100.0)
+		var z = machine.control_unit.convert2mm(block.get_param("Z") / 100.0)
 
 		last_position = machine.tool.position
 		machine.tool.position = Vector2(x, z)
 	
 	func calculate_duration():
-		var x = block.get_param("X") / 100.0
-		var z = block.get_param("Z") / 100.0
+		var x = machine.control_unit.convert2mm(block.get_param("X") / 100.0)
+		var z = machine.control_unit.convert2mm(block.get_param("Z") / 100.0)
 		
 		# y axis doesnt exist on lathe and machine zero point is oriented that way
 		var move_to = machine.machine_zero_point.to_global((Vector3(x, 0, z))) + machine.tool.offset
@@ -128,8 +129,8 @@ class InterpolationFunction extends Function:
 	func animate(sim_anim: SimulationAnimation):
 		var start_time = sim_anim.get_track_last_key_time(sim_anim.Tracks.TOOL)
 		
-		var x = block.get_param("X") / 100.0
-		var z = block.get_param("Z") / 100.0
+		var x = machine.control_unit.convert2mm(block.get_param("X") / 100.0)
+		var z = machine.control_unit.convert2mm(block.get_param("Z") / 100.0)
 
 		# y axis doesnt exist on lathe and machine zero point is oriented that way
 		var move_to = machine.machine_zero_point.to_global(Vector3(x, 0, z)) + machine.tool.offset
@@ -225,3 +226,29 @@ class G04 extends Function:
 		# sim_anim.animation.track_insert_key(sim_anim.Tracks.TOOL, start_time, machine.tool.tool_mesh_instance.position + machine.tool.offset);
 		sim_anim.animation.track_insert_key(sim_anim.Tracks.TOOL, start_time + length, machine.tool.tool_mesh_instance.position + machine.tool.offset);
 		sim_anim.animation.length += length
+
+
+
+
+class G20 extends Function:
+	static func validate(_block: Block):
+		return true
+
+	func set_state():
+		super()
+		machine.control_unit.selected_unit = machine.control_unit.Unit.INCHES
+	
+	func calculate_duration():
+		return 0
+
+
+class G21 extends Function:
+	static func validate(_block: Block):
+		return true
+
+	func set_state():
+		super()
+		machine.control_unit.selected_unit = machine.control_unit.Unit.MILLIMETERS
+	
+	func calculate_duration():
+		return 0

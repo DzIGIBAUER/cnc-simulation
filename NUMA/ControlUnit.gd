@@ -1,6 +1,27 @@
 class_name ControlUnit
 extends Node
 
+enum Unit {
+	MILLIMETERS,
+	INCHES,
+}
+
+var selected_unit: Unit = Unit.MILLIMETERS
+
+## Converts input value from [member ControlUnit.selected_unit] to millimeters
+## [member ControlUnit.selected_unit] is modified by GCode functions like G20 and G21
+func convert2mm(value: float) -> float:
+
+	match selected_unit:
+		Unit.MILLIMETERS:
+			return value 
+		Unit.INCHES:
+			return value * 25.4
+		_:
+			push_error("Variable selected_unit doesn't match any Unit Enum value. Current value is %s " % selected_unit)
+			return value
+
+
 
 class Function extends RefCounted:
 

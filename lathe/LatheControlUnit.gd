@@ -195,3 +195,33 @@ class G03 extends G02:
 	func calculate_interpolation_results(tool_start: Vector3, tool_end: Vector3):
 		var radius = block.get_param("R")
 		simulation_result = machine.simulation_environment.calculate_lathe_circular_interpolation_result(tool_start, tool_end, radius, false)
+
+class G04 extends Function:
+
+	static func validate(block_: Block):
+		var p = block_.params.get("P")
+		var x = block_.params.get("X")
+
+		return p or x
+	
+	func set_state():
+		super()
+
+	func calculate_duration():
+		var length: float
+
+		if "P" in block.params:
+			length = block.get_param("P") / 100
+		else:
+			length = block.get_param("X")
+		
+		return length
+	
+	func animate(sim_anim: SimulationAnimation):
+		var start_time = sim_anim.get_track_last_key_time(sim_anim.Tracks.TOOL)
+
+		var length = calculate_duration()
+
+		# sim_anim.animation.track_insert_key(sim_anim.Tracks.TOOL, start_time, machine.tool.tool_mesh_instance.position + machine.tool.offset);
+		sim_anim.animation.track_insert_key(sim_anim.Tracks.TOOL, start_time + length, machine.tool.tool_mesh_instance.position + machine.tool.offset);
+		sim_anim.animation.length += length

@@ -16,6 +16,7 @@ text = "M03 S500
 G00 X0 Z30
 G01 X12 Z30 F0.1
 G01 X12 Z15 F0.1
+G04 X2
 G03 X10 Z13 F0.1 R0.02"
 caret_blink = true
 script = ExtResource("1_iygxp")

@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://bdi3wf2i6uw5t"]
+
+[ext_resource type="Script" path="res://UI/code_edit/code_edit.gd" id="1_iygxp"]
+
+[node name="VBoxContainer" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GCodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("error_label")]
+layout_mode = 2
+size_flags_vertical = 3
+text = "M03 S500
+G00 X0 Z30
+G01 X12 Z30 F0.1
+G01 X12 Z15 F0.1
+G03 X10 Z13 F0.1 R0.02"
+caret_blink = true
+script = ExtResource("1_iygxp")
+error_label = NodePath("../Label")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2

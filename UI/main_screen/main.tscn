@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://UI/main_screen/main.gd" id="1_anjr7"]
 [ext_resource type="PackedScene" uid="uid://baabchr6uwr3k" path="res://UI/debug_window/debug_window.tscn" id="2_c61lp"]
-[ext_resource type="Script" path="res://UI/code_edit/code_edit.gd" id="2_vrl4a"]
+[ext_resource type="PackedScene" uid="uid://bdi3wf2i6uw5t" path="res://UI/code_edit/code_editor.tscn" id="2_dptng"]
 
 [node name="main" type="Control"]
 layout_mode = 3
@@ -21,16 +21,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GCodeEdit" type="CodeEdit" parent="VBoxContainer"]
+[node name="VBoxContainer" parent="VBoxContainer" instance=ExtResource("2_dptng")]
 layout_mode = 2
 size_flags_vertical = 3
-text = "M03 S500
-G00 X0 Z30
-G01 X12 Z30 F0.1
-G01 X12 Z15 F0.1
-G03 X10 Z13 F0.1 R0.02"
-caret_blink = true
-script = ExtResource("2_vrl4a")
 
 [node name="Button" type="Button" parent="VBoxContainer"]
 layout_mode = 2
@@ -40,5 +33,9 @@ text = "Start"
 visible = false
 layout_mode = 0
 anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]

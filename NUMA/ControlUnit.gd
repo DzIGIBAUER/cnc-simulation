@@ -52,7 +52,7 @@ func parse_gcode(code: String) -> GCode:
 			if not letter in valid_letters():
 				gcode.invalidate(line_num, col, "Letter %s is not a valid letter" % letter)
 			
-			if not number.is_valid_float():
+			if number and not number.is_valid_float():
 				gcode.invalidate(line_num, col+1, "Number %s is not a valid parameter value" % number)
 
 			if letter in ["G", "M"]:
@@ -71,9 +71,10 @@ func parse_gcode(code: String) -> GCode:
 		
 		var block = Block.new(params)
 		
-		var valid = get(main_function).validate(block)
-		if not valid:
-			gcode.invalidate(line_num, 0, "Wrong parameters")
+		if get(main_function):
+			var valid = get(main_function).validate(block)
+			if not valid:
+				gcode.invalidate(line_num, 0, "Wrong parameters")
 
 		# set metadata for duration here
 		gcode.blocks.append(block)

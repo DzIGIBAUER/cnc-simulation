@@ -6,6 +6,15 @@ enum Unit {
 	INCHES,
 }
 
+enum FunctionCategory {
+	MOTION,
+	COMPENSATION,
+	COORDINATE,
+	CANNED,
+	OTHER,
+	MCODE,
+}
+
 var selected_unit: Unit = Unit.MILLIMETERS
 
 ## Converts input value from [member ControlUnit.selected_unit] to millimeters
@@ -25,6 +34,7 @@ func convert2mm(value: float) -> float:
 
 class Function extends RefCounted:
 
+	var category: FunctionCategory : get = get_category
 	var machine: Machine
 	var block: Block
 
@@ -35,6 +45,8 @@ class Function extends RefCounted:
 	static func validate(_block: Block) -> bool:
 		return false
 	
+	func get_category() -> FunctionCategory: return FunctionCategory.OTHER
+
 	func set_state() -> void:
 		machine.on_state_set.emit(self)
 

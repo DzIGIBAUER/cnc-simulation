@@ -19,7 +19,10 @@ class M03 extends Function:
 		if not "S" in block_.params:
 			return false
 		return true
+
 	
+	func get_category(): return FunctionCategory.MCODE
+
 	func set_state():
 		super()
 		self.machine.chuck.speed = block.get_param("S")
@@ -84,6 +87,8 @@ class InterpolationFunction extends Function:
 		var z = block_.params.get("Z")
 
 		return x or z
+
+	func get_category(): return FunctionCategory.MOTION
 	
 	func get_feedrate() -> float:
 		return machine.MAX_TOOL_SPEED
@@ -205,6 +210,8 @@ class G04 extends Function:
 
 		return p or x
 	
+	func get_category(): return FunctionCategory.MOTION
+
 	func set_state():
 		super()
 
@@ -233,6 +240,8 @@ class G04 extends Function:
 class G20 extends Function:
 	static func validate(_block: Block):
 		return true
+	
+	func get_category(): return FunctionCategory.COORDINATE
 
 	func set_state():
 		super()
@@ -245,6 +254,8 @@ class G20 extends Function:
 class G21 extends Function:
 	static func validate(_block: Block):
 		return true
+	
+	func get_category(): return FunctionCategory.COORDINATE
 
 	func set_state():
 		super()

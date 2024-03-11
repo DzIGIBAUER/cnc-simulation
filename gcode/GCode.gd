@@ -6,6 +6,7 @@ var valid: bool :
 var errors: Array[GCodeError] = []
 
 var blocks: Array[Block] = []
+var functions: Array[ControlUnit.Function] = []
 
 func invalidate(line, column, message) -> void:
 	print("Line %s column %s error: %s" % [line, column, message])

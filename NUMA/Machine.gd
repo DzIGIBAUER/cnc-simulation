@@ -42,7 +42,6 @@ func point_to_workspace(point: Vector3) -> Vector3:
 func load_gcode(code: String):
 	gcode = control_unit.parse_gcode(code)
 
-func run():
 	for block in gcode.blocks:
 		var function_name: String
 		
@@ -50,9 +49,15 @@ func run():
 			function_name = "G" + block.params["G"]
 		elif "M" in block.params.keys():
 			function_name = "M" + block.params["M"]
+		
+		if control_unit.get(function_name):
+			var function: ControlUnit.Function = control_unit.get(function_name).new(self, block)
+			gcode.functions.append(function)
 
-		var function: ControlUnit.Function = control_unit.get(function_name).new(self, block)
-		print("function %s takes %s seconds to complete" % [function_name, function.calculate_duration()])
+
+func run():
+	for function in gcode.functions:
+		print("Setting state and animating %s" % function)
 		function.set_state()
 		function.animate($SimulationAnimation)
 	

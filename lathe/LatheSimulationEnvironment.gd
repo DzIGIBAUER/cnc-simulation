@@ -111,7 +111,7 @@ func calculate_lathe_circular_interpolation_result(tool_start: Vector3, tool_end
 	
 	var center = calculate_center_point_r(tool_start_2d, tool_end_2d, radius)
 
-	print(tool_start, tool_end, center)
+	# print(tool_start, tool_end, center)
 	
 	var circle_points = calculate_circle_points(tool_start_2d, tool_end_2d, center, clockwise)
 
@@ -189,8 +189,8 @@ func calculate_center_point_r(start: Vector2, end: Vector2, radius: float) -> Ve
 
 	var d = sqrt(pow(radius, 2) - midpoint.distance_squared_to(end))
 
-	prints(start, end)
-	prints("alo", M, m, d, (Vector2.ZERO.direction_to(m-midpoint)*d)+midpoint )
+	# prints(start, end)
+	# prints("alo", M, m, d, (Vector2.ZERO.direction_to(m-midpoint)*d)+midpoint )
 
 	return (midpoint + midpoint.direction_to(m)*d)
 
@@ -202,7 +202,7 @@ func calculate_circle_points(start: Vector2, end: Vector2, center: Vector2, cloc
 
 	degrees = degrees if clockwise else -degrees
 
-	print("degrees: %s, Start: %s, end: %s" % [degrees, rad_to_deg(center.angle_to_point(start)), rad_to_deg(center.angle_to_point(end))])
+	# print("degrees: %s, Start: %s, end: %s" % [degrees, rad_to_deg(center.angle_to_point(start)), rad_to_deg(center.angle_to_point(end))])
 	
 	circle_points.append(start)
 

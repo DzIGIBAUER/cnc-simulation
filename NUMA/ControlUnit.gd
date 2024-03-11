@@ -15,7 +15,13 @@ enum FunctionCategory {
 	MCODE,
 }
 
+enum PositioningMode {
+	ABSOLUTE,
+	RELATIVE,
+}
+
 var selected_unit: Unit = Unit.MILLIMETERS
+var selected_positioning_mode: PositioningMode = PositioningMode.ABSOLUTE
 
 ## Converts input value from [member ControlUnit.selected_unit] to millimeters
 ## [member ControlUnit.selected_unit] is modified by GCode functions like G20 and G21
@@ -30,6 +36,55 @@ func convert2mm(value: float) -> float:
 			push_error("Variable selected_unit doesn't match any Unit Enum value. Current value is %s " % selected_unit)
 			return value
 
+## Fills the [param block] parameter [params param_name] with value from first previous function block that contains it and has
+## the caregory of [param function_category]. Called internaly from Function init.
+## Assumes the [param functions] is a list of functions before the function where the [param block] is part of.
+func _fill_in_missing_parameter(functions: Array[Function], block: Block, param_name: String, function_category: FunctionCategory):
+	print("Processing block %s for value %s\n\n" % [block, param_name])
+
+	if param_name in block.params:
+		print("Block %s already has parameter %s. Returning..." % [block, param_name])
+		return block
+
+	var updated_block = Block.new(block.params)
+
+	for i in range(functions.size()-1, 0, -1):
+		var func_ = functions[i]
+
+		if func_.category != function_category: continue
+
+		if not param_name in func_.block.params: continue
+
+		print("Populated %s with value of %s from %s" % [block, param_name, func_])
+		updated_block.params[param_name] = func_.block.params[param_name]
+		break
+
+
+	return updated_block
+
+
+	
+
+func _process_function_block(function: Function) -> Block:
+	
+	var processed_block = Block.new(function.block.params)
+
+	# fill in if theres missing X or Z coordinate
+	if function.category == FunctionCategory.MOTION:
+		var updated_block = _fill_in_missing_parameter(function.machine.gcode.functions, function.block, "X", FunctionCategory.MOTION)
+		processed_block.params.merge(updated_block.params)
+
+		updated_block = _fill_in_missing_parameter(function.machine.gcode.functions, function.block, "Z", FunctionCategory.MOTION)
+		processed_block.params.merge(updated_block.params)
+
+	# Convert to millimeters if inches are used in GCode and we have a motion function
+	# Not sure if there are any other parameters that are affected by selected unit
+	if selected_unit == Unit.INCHES and function.category == FunctionCategory.MOTION:
+		function.block.params["X"] *= 25.4
+		function.block.params["Z"] *= 25.4
+		
+
+	return processed_block
 
 
 class Function extends RefCounted:
@@ -41,6 +96,18 @@ class Function extends RefCounted:
 	func _init(machine_: Machine, block_: Block):
 		self.machine = machine_
 		self.block = block_
+
+		self.block = machine.control_unit._process_function_block(self)
+	
+	func _to_string():
+		var function_name: String
+		
+		if "G" in block.params.keys():
+			function_name = "G" + block.params["G"]
+		elif "M" in block.params.keys():
+			function_name = "M" + block.params["M"]
+		
+		return function_name
 	
 	static func validate(_block: Block) -> bool:
 		return false
@@ -109,7 +176,6 @@ func parse_gcode(code: String) -> GCode:
 			if not valid:
 				gcode.invalidate(line_num, 0, "Wrong parameters")
 
-		# set metadata for duration here
 		gcode.blocks.append(block)
 	
 	return gcode

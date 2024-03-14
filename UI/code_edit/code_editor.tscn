@@ -13,6 +13,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_vertical = 3
 text = "M03 S500
+G91
 G00 X0 Z30
 G01 X12 Z30 F0.1
 G01 X12 Z15 F0.1"

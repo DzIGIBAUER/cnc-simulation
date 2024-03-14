@@ -40,15 +40,19 @@ func convert2mm(value: float) -> float:
 ## the caregory of [param function_category]. Called internaly from Function init.
 ## Assumes the [param functions] is a list of functions before the function where the [param block] is part of.
 func _fill_in_missing_parameter(functions: Array[Function], block: Block, param_name: String, function_category: FunctionCategory):
-	print("Processing block %s for value %s\n\n" % [block, param_name])
+	print("Processing block %s for value %s" % [block, param_name])
 
 	if param_name in block.params:
 		print("Block %s already has parameter %s. Returning..." % [block, param_name])
 		return block
-
+	
 	var updated_block = Block.new(block.params)
+	
+	if selected_positioning_mode == PositioningMode.RELATIVE:
+		updated_block.params[param_name] = "0"
+		return updated_block
 
-	for i in range(functions.size()-1, 0, -1):
+	for i in range(functions.size()-1, -1, -1):
 		var func_ = functions[i]
 
 		if func_.category != function_category: continue
@@ -61,20 +65,22 @@ func _fill_in_missing_parameter(functions: Array[Function], block: Block, param_
 
 
 	return updated_block
-
-
 	
 
 func _process_function_block(function: Function) -> Block:
 	
 	var processed_block = Block.new(function.block.params)
 
+	var previous_functions = function.machine.gcode.functions.slice(0, function.machine.gcode.functions.find(function))
+
+	# TODO: Also check for CANNED
+
 	# fill in if theres missing X or Z coordinate
 	if function.category == FunctionCategory.MOTION:
-		var updated_block = _fill_in_missing_parameter(function.machine.gcode.functions, function.block, "X", FunctionCategory.MOTION)
+		var updated_block = _fill_in_missing_parameter(previous_functions, function.block, "X", FunctionCategory.MOTION)
 		processed_block.params.merge(updated_block.params)
 
-		updated_block = _fill_in_missing_parameter(function.machine.gcode.functions, function.block, "Z", FunctionCategory.MOTION)
+		updated_block = _fill_in_missing_parameter(previous_functions, function.block, "Z", FunctionCategory.MOTION)
 		processed_block.params.merge(updated_block.params)
 
 	# Convert to millimeters if inches are used in GCode and we have a motion function
@@ -82,8 +88,22 @@ func _process_function_block(function: Function) -> Block:
 	if selected_unit == Unit.INCHES and function.category == FunctionCategory.MOTION:
 		function.block.params["X"] *= 25.4
 		function.block.params["Z"] *= 25.4
-		
+	
+	# Now we have populated X and Z for previous function
+	if selected_positioning_mode == PositioningMode.RELATIVE:
+		print("relative je")
 
+		# Find first previous function that we have to take X and Z from
+		for i in range(previous_functions.size()-1, -1, -1):
+			var func_ = previous_functions[i]
+
+			if func_.category != FunctionCategory.MOTION: continue
+
+			processed_block.params["X"] = processed_block.get_param("X") + func_.block.get_param("X")
+			processed_block.params["Z"] = processed_block.get_param("Z") + func_.block.get_param("Z")
+
+			break
+			
 	return processed_block
 
 
@@ -96,8 +116,6 @@ class Function extends RefCounted:
 	func _init(machine_: Machine, block_: Block):
 		self.machine = machine_
 		self.block = block_
-
-		self.block = machine.control_unit._process_function_block(self)
 	
 	func _to_string():
 		var function_name: String
@@ -115,8 +133,8 @@ class Function extends RefCounted:
 	func get_category() -> FunctionCategory: return FunctionCategory.OTHER
 
 	func set_state() -> void:
+		self.block = machine.control_unit._process_function_block(self)
 		machine.on_state_set.emit(self)
-
 		return
 
 	func calculate_duration() -> float:

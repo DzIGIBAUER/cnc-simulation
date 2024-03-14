@@ -263,3 +263,31 @@ class G21 extends Function:
 	
 	func calculate_duration():
 		return 0
+
+
+class G90 extends Function:
+	static func validate(_block: Block):
+		return true
+	
+	func get_category(): return FunctionCategory.COORDINATE
+
+	func set_state():
+		super()
+		machine.control_unit.selected_positioning_mode = PositioningMode.ABSOLUTE
+	
+	func calculate_duration():
+		return 0
+
+
+class G91 extends Function:
+	static func validate(_block: Block):
+		return true
+	
+	func get_category(): return FunctionCategory.COORDINATE
+
+	func set_state():
+		super()
+		machine.control_unit.selected_positioning_mode = PositioningMode.RELATIVE
+	
+	func calculate_duration():
+		return 0

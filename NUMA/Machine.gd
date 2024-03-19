@@ -25,6 +25,7 @@ var gcode: GCode
 
 func _ready():
 	workspace = AABB(machine_zero_point.position, reference_point.position-machine_zero_point.position).abs()
+	Global.machine = self
 
 # TODO: don't run this all the time
 func _process(_delta):

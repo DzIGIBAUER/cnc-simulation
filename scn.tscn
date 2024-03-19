@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://l7pxugqn1qq1"]
+[gd_scene load_steps=24 format=3 uid="uid://l7pxugqn1qq1"]
 
 [ext_resource type="Script" path="res://scn.gd" id="1_mamcb"]
 [ext_resource type="Script" path="res://NUMA/Machine.gd" id="2_2nbhc"]
@@ -17,6 +17,9 @@
 [sub_resource type="PlaneMesh" id="PlaneMesh_jqlle"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_7p21f"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_au6ag"]
+vertex_color_use_as_albedo = true
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_vggpr"]
 
@@ -127,6 +130,7 @@ mesh = SubResource("CylinderMesh_7p21f")
 
 [node name="Part" type="MeshInstance3D" parent="Machine/Chuck/MeshInstance3D"]
 transform = Transform3D(0.407242, -1.24345e-14, 2.11758e-22, 9.9476e-14, 5.42869, 5.68434e-14, -2.11758e-21, -3.55271e-14, 0.407242, 2.98023e-08, 6.43976, -6.74154e-08)
+material_override = SubResource("StandardMaterial3D_au6ag")
 mesh = SubResource("CylinderMesh_vggpr")
 
 [node name="Waste" type="MeshInstance3D" parent="Machine/Chuck/MeshInstance3D/Part"]

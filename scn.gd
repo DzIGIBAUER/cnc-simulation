@@ -69,7 +69,8 @@ func _ready():
 	# $MeshInstance3D2.mesh = arr_mesh2
 
 	# machine.load_gcode("M03 S500\nG01 X40 Z100\nG01 X40 Z80\nG02 X0 Z60 R0.4")
-	machine.load_gcode("G01 X40 Z100 F0.1\nG01 X40 Z80 F0.3\nG03 X0 Z60 R0.4 F0.1")
+	# machine.load_gcode("G01 X40 Z100 F0.5\nG32 X40 Z80 F0.6\nG03 X0 Z60 R0.4 F0.2")
+	machine.load_gcode("G01 X40 Z100 F0.5\nG32 X40 Z80 F0.6")
 	# machine.load_gcode("G01 X40 Z100 F0.1")
 	if machine.gcode.valid:
 		machine.run()

@@ -214,3 +214,64 @@ func calculate_circle_points(start: Vector2, end: Vector2, center: Vector2, cloc
 	
 
 	return circle_points
+
+
+func calculate_lathe_thread_result(tool_start: Vector3, tool_end: Vector3) -> SimulationResult:
+	var tool_start_2d = Vector2(tool_start.x, tool_start.y)
+	var tool_end_2d = Vector2(tool_end.x, tool_end.y)
+
+	var extruded_tool_poly = Simulation.extrude(tool_polygon_node.polygon, 0, tool_end_2d)
+	var displaced_tool_poly = Simulation.displace(tool_polygon_node.polygon, 0, tool_end_2d)
+
+
+	var fix_point = machine.chuck.chuck_mesh_instance.position
+	fix_point = Vector2(fix_point.x, fix_point.y)
+
+	var mirrored_extruded_tool_poly = PackedVector2Array()
+	for p in extruded_tool_poly:
+		p.y = fix_point.y - ( p.y - fix_point.y )
+		mirrored_extruded_tool_poly.append(p)
+	
+
+	# var merged_tool_polygon = Geometry2D.merge_polygons(extruded_tool_poly, mirrored_extruded_tool_poly)[0]
+
+	var clipped_part = Geometry2D.clip_polygons(part_polygon_node.polygon, extruded_tool_poly)[0]
+	clipped_part = Geometry2D.clip_polygons(clipped_part, mirrored_extruded_tool_poly)[0]
+	
+	# TODO: make this cleaner
+	# clip_polygons can return multiple polygons
+	# we need the upper one if the cutoff_part takes upper=true as third argument
+	var clipped_waste: PackedVector2Array
+	for poly in Geometry2D.clip_polygons(part_polygon_node.polygon, clipped_part):
+		if not clipped_waste:
+			clipped_waste = poly
+		else:
+			if poly[0].y > clipped_waste[0].y:
+				clipped_waste = poly
+
+	var dw = Global.debug_window
+	
+	var item = DebugItem.new()
+	item.polygons = [clipped_part]
+	dw.add_debug_item("Thread Clipped", item)
+
+	
+
+	tool_polygon_node.polygon = extruded_tool_poly
+
+	var cutoff_part = Simulation.cutoff_part(clipped_part, fix_point, true)
+	var cutoff_waste = Simulation.cutoff_part(clipped_waste, fix_point, true)
+	
+	item = DebugItem.new()
+	item.polygons = [clipped_waste]
+	dw.add_debug_item("Thread Waste BRE", item)
+
+	tool_polygon_node.polygon = displaced_tool_poly
+	part_polygon_node.polygon = clipped_part
+	
+	var result = SimulationResult.new()
+	result.mesh = Simulation.extrudeThreadPolygon(machine, cutoff_part, Vector3.DOWN, Vector3.UP, 0.001)
+	result.waste_mesh = Simulation.extrudePartPolygon(machine, cutoff_waste, Vector3.DOWN, Vector3.UP)
+	result.tool_positions = PackedVector3Array([tool_start, tool_end])
+
+	return result

@@ -212,11 +212,9 @@ static func extrudePartPolygon(machine: Machine, polygon: PackedVector2Array, po
 			dir = b - pivot
 			dir = Quaternion(pointA.direction_to(pointB), deg_to_rad(1)) * dir
 			var c1 = dir + pivot
+			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]), PackedColorArray([Color.BLUE, Color.BLUE, Color.BLUE]))
 
-			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]))
-
-			st.add_triangle_fan(PackedVector3Array([c, c1, b]), PackedVector2Array([Vector2.ONE, Vector2.ONE, Vector2.ZERO]))
-			
+			st.add_triangle_fan(PackedVector3Array([c, c1, b]), PackedVector2Array([Vector2.ONE, Vector2.ONE, Vector2.ZERO]), PackedColorArray([Color.BLUE, Color.BLUE, Color.BLUE]))
 			a = c
 			b = c1
 	
@@ -253,9 +251,9 @@ static func extrudeThreadPolygon(machine: Machine, polygon: PackedVector2Array, 
 			var c1 = dir + pivot
 			c1.y -= step
 
-			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]))
+			st.add_triangle_fan(PackedVector3Array([a, c, b]), PackedVector2Array([polygon[i], polygon[second_index], Vector2.ONE]), PackedColorArray([Color.ORANGE_RED, Color.ORANGE_RED, Color.ORANGE_RED]))
 
-			st.add_triangle_fan(PackedVector3Array([c, c1, b]), PackedVector2Array([Vector2.ONE, Vector2.ONE, Vector2.ZERO]))
+			st.add_triangle_fan(PackedVector3Array([c, c1, b]), PackedVector2Array([Vector2.ONE, Vector2.ONE, Vector2.ZERO]), PackedColorArray([Color.ORANGE_RED, Color.ORANGE_RED, Color.ORANGE_RED]))
 			
 			a = c
 			b = c1

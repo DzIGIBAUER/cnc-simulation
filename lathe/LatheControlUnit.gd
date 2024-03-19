@@ -265,6 +265,14 @@ class G21 extends Function:
 		return 0
 
 
+class G32 extends G01:
+	
+	func get_category(): return FunctionCategory.CANNED
+
+	func calculate_interpolation_results(tool_start: Vector3, tool_end: Vector3):
+		simulation_result = machine.simulation_environment.calculate_lathe_thread_result(tool_start, tool_end)
+
+
 class G90 extends Function:
 	static func validate(_block: Block):
 		return true

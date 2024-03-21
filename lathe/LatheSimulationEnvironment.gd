@@ -2,6 +2,12 @@ class_name LatheSimulationEnvironment
 extends Node2D
 
 
+var base_part_mesh = preload("res://part.tres")
+
+# FIXME: not like this
+@onready var tool_starting_position = Vector3(-0.028, 0.092, 0)
+
+# TODO: use Global.machine instead
 @onready var machine: Machine = get_parent()
 
 var part_polygon_node = Polygon2D.new()
@@ -11,6 +17,20 @@ var part_material: Material
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	
+	_project_meshes()
+
+	# var dw: DebugWindow = machine.get_node("../DebugWindow")
+
+	# var item = DebugItem.new()
+	# item.polygons = [part_polygon_node.polygon, tool_polygon_node.polygon]
+	# dw.add_debug_item("bree", item)
+
+	print("Initialized Lathe Simulation Environment")
+
+
+## Takes part and tool meshes and projects them to 2D polygons for simulation
+func _project_meshes():
 	var	flat_part = Simulation.projected(machine, machine.chuck.processed_part, machine.chuck.processed_part.mesh)	
 	var part_poly = PackedVector2Array()
 	for v in flat_part:
@@ -25,14 +45,16 @@ func _ready():
 	tool_polygon_node.polygon = Geometry2D.convex_hull(tool_poly)
 
 
-	# var dw: DebugWindow = machine.get_node("../DebugWindow")
 
-	# var item = DebugItem.new()
-	# item.polygons = [part_polygon_node.polygon, tool_polygon_node.polygon]
-	# dw.add_debug_item("bree", item)
+## Resets the simulation environment by reseting the part mesh, tool position and animation
+func reset():
+	Global.machine.simulation_animation.clear_animations()
+	
+	Global.machine.tool.tool_mesh_instance.position = tool_starting_position
 
-	print("Initialized Lathe Simulation Environment")
-
+	# First set mesh and then project it
+	Global.machine.chuck.processed_part.mesh = base_part_mesh
+	_project_meshes()
 
 class SimulationResult extends RefCounted:
 	var tool_positions: PackedVector3Array

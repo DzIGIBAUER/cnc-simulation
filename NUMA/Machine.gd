@@ -10,6 +10,7 @@ signal on_state_set(function: ControlUnit.Function)
 @export var simulation_environment: Node2D
 @export var machine_mesh_instance: Node
 @export var control_unit: ControlUnit
+@export var simulation_animation: SimulationAnimation
 
 @export var machine_zero_point: Node3D
 @export var reference_point: Node3D
@@ -60,7 +61,7 @@ func run():
 	for function in gcode.functions:
 		print("Setting state and animating %s" % function)
 		function.set_state()
-		function.animate($SimulationAnimation)
+		function.animate(simulation_animation)
 	
-	$SimulationAnimation.play("animation/simulation")
+	simulation_animation.play("animation/simulation")
 

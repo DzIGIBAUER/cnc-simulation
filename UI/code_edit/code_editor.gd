@@ -29,4 +29,5 @@ func _on_g_code_edit_errors_changed():
 
 
 func _on_run_button_pressed():
+	Global.machine.simulation_environment.reset()
 	Global.machine.run()

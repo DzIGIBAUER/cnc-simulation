@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="3_kh7vq"]
 [ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_ltlcw"]
 [ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_2cpmw"]
+[ext_resource type="CylinderMesh" uid="uid://ywvtk3b3i0y8" path="res://part.tres" id="6_71vdo"]
 [ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_c2qt8"]
 [ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="7_0uhy5"]
 [ext_resource type="Shader" path="res://assets/shaders/waste_shrink.gdshader" id="7_mewmu"]
@@ -14,11 +15,6 @@
 
 [sub_resource type="BoxMesh" id="BoxMesh_t412k"]
 size = Vector3(0.2, 0.2, 0.2)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_0dkf3"]
-top_radius = 0.05
-bottom_radius = 0.05
-height = 2.5
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_foble"]
 render_priority = 0
@@ -76,11 +72,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.68457)
 near = 0.01
 script = ExtResource("1_hdo0e")
 
-[node name="Machine" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D" node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
+[node name="Machine" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D" node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "simulation_animation", "machine_zero_point", "reference_point", "chuck", "tool")]
 script = ExtResource("2_4j2bl")
 simulation_environment = NodePath("Node2D")
 machine_mesh_instance = NodePath("MeshInstance3D")
 control_unit = NodePath("LatheControlUnit")
+simulation_animation = NodePath("SimulationAnimation")
 machine_zero_point = NodePath("Node3D")
 reference_point = NodePath("Node3D2")
 chuck = NodePath("Chuck")
@@ -116,7 +113,7 @@ mesh = SubResource("BoxMesh_t412k")
 
 [node name="Part" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Chuck/MeshInstance3D"]
 transform = Transform3D(1, 1.24345e-13, 0, -1.13687e-13, 1, 1.13687e-13, 0, 2.13163e-14, 1, 0, 1.5, 0)
-mesh = SubResource("CylinderMesh_0dkf3")
+mesh = ExtResource("6_71vdo")
 
 [node name="Waste" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/Node3D/Machine/Chuck/MeshInstance3D/Part"]
 material_override = SubResource("ShaderMaterial_foble")

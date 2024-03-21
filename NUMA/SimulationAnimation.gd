@@ -23,6 +23,10 @@ func _ready():
 	
 	add_animation_library("animation", anim_lib)
 
+	_init_tracks()
+
+
+func _init_tracks():
 	# animation.add_track(Animation.TYPE_ROTATION_3D, Tracks.CHUCK)
 	# TYPE_ROTATION_3D Uses quats and they cant represent agnles above 360deg
 	animation.add_track(Animation.TYPE_VALUE, Tracks.CHUCK)
@@ -36,6 +40,11 @@ func _ready():
 
 	animation.add_track(Animation.TYPE_VALUE, Tracks.WASTE)
 	animation.track_set_path(Tracks.WASTE, "%s:mesh" % machine.get_path_to(machine.chuck.waste))
+
+## Resets animation to clean state with all track present
+func clear_animations():
+	animation.clear()
+	_init_tracks()
 
 
 func get_track_last_key_time(track: Tracks) -> float:

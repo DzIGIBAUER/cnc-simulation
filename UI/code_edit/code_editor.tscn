@@ -1,15 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://bdi3wf2i6uw5t"]
+[gd_scene load_steps=3 format=3 uid="uid://bdi3wf2i6uw5t"]
 
+[ext_resource type="Script" path="res://UI/code_edit/code_editor.gd" id="1_1uk5u"]
 [ext_resource type="Script" path="res://UI/code_edit/code_edit.gd" id="1_iygxp"]
 
-[node name="VBoxContainer" type="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" node_paths=PackedStringArray("error_label", "run_button")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_1uk5u")
+error_label = NodePath("PanelContainer/Label")
+run_button = NodePath("PanelContainer/RunButton")
 
-[node name="GCodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("error_label")]
+[node name="GCodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("error_label", "run_button")]
 layout_mode = 2
 size_flags_vertical = 3
 text = "M03 S500
@@ -18,8 +22,25 @@ G01 X12 Z30 F0.1
 G32 X12 Z15 F0.1"
 caret_blink = true
 script = ExtResource("1_iygxp")
-error_label = NodePath("../Label")
+error_label = NodePath("../PanelContainer/Label")
+run_button = NodePath("../PanelContainer/RunButton")
 
-[node name="Label" type="Label" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+
+[node name="Label" type="Label" parent="PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "ERRROR BRE"
+vertical_alignment = 1
 text_overrun_behavior = 1
+
+[node name="RunButton" type="Button" parent="PanelContainer"]
+layout_mode = 2
+text = "Run code"
+
+[connection signal="errors_changed" from="GCodeEdit" to="." method="_on_g_code_edit_errors_changed"]
+[connection signal="text_changed" from="GCodeEdit" to="GCodeEdit" method="_on_text_changed"]
+[connection signal="pressed" from="PanelContainer/RunButton" to="." method="_on_run_button_pressed"]

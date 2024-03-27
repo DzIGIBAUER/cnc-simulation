@@ -3,9 +3,25 @@ class_name DebugWindow
 
 
 var item_node_mapping = {}
+var events := {}
+
 
 func _ready():
 	Global.debug_window = self
+
+
+
+func _input(event):
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			events[event.index] = event
+		else:
+			events.erase(event.index)
+
+		if events.size() == 3:
+			visible = !visible
+			get_viewport().set_input_as_handled()
+
 
 func add_debug_item(
 	title: String,

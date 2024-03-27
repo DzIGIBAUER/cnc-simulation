@@ -11,6 +11,7 @@ signal on_state_set(function: ControlUnit.Function)
 @export var machine_mesh_instance: Node
 @export var control_unit: ControlUnit
 @export var simulation_animation: SimulationAnimation
+@export var camera: Camera3D
 
 @export var machine_zero_point: Node3D
 @export var reference_point: Node3D

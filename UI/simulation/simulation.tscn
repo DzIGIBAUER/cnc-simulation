@@ -1,6 +1,5 @@
 [gd_scene load_steps=17 format=3 uid="uid://c2u62iyhm2x81"]
 
-[ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="1_hdo0e"]
 [ext_resource type="Script" path="res://lathe/LatheSimulationEnvironment.gd" id="2_0ku2k"]
 [ext_resource type="Script" path="res://NUMA/Machine.gd" id="2_4j2bl"]
 [ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="3_kh7vq"]
@@ -10,6 +9,7 @@
 [ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_c2qt8"]
 [ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="7_0uhy5"]
 [ext_resource type="Shader" path="res://assets/shaders/waste_shrink.gdshader" id="7_mewmu"]
+[ext_resource type="PackedScene" uid="uid://ctpq25wpfdnxn" path="res://nodes/android/orbit_camera/OrbitCamera.tscn" id="10_kslfy"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_3in5y"]
 
@@ -51,6 +51,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 1
@@ -66,11 +67,6 @@ size = Vector2i(1024, 768)
 render_target_update_mode = 4
 
 [node name="Node3D" type="Node3D" parent="SubViewportContainer/SubViewport"]
-
-[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport/Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.68457)
-near = 0.01
-script = ExtResource("1_hdo0e")
 
 [node name="Machine" type="Node3D" parent="SubViewportContainer/SubViewport/Node3D" node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "simulation_animation", "machine_zero_point", "reference_point", "chuck", "tool")]
 script = ExtResource("2_4j2bl")
@@ -138,6 +134,11 @@ libraries = {
 }
 script = ExtResource("7_0uhy5")
 machine = NodePath("..")
+
+[node name="OrbitCamera" parent="SubViewportContainer/SubViewport/Node3D/Machine" instance=ExtResource("10_kslfy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.226786, 0.155131, 0)
+rotation_factor = 0.5
+zoom_factor = 0.5
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/Node3D"]
 transform = Transform3D(0.96693, -0.127135, 0.221094, 0, 0.866897, 0.498488, -0.255041, -0.482003, 0.838229, 1.42849, 4.42589, 7.44594)

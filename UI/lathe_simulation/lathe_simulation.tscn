@@ -19,6 +19,7 @@ layout_mode = 1
 
 [node name="SidePanel" parent="." instance=ExtResource("2_avoc5")]
 layout_mode = 1
+mouse_filter = 2
 
 [node name="DebugWindow" parent="." instance=ExtResource("4_x13f4")]
 visible = false

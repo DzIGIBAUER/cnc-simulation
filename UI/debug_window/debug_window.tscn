@@ -47,3 +47,4 @@ select_mode = 1
 
 [connection signal="empty_clicked" from="HBoxContainer/ItemList" to="." method="_on_item_list_empty_clicked"]
 [connection signal="item_selected" from="HBoxContainer/ItemList" to="." method="_on_item_list_item_selected"]
+[connection signal="gui_input" from="HBoxContainer/VBoxContainer" to="." method="_on_v_box_container_gui_input"]

@@ -223,7 +223,7 @@ static func extrudePartPolygon(machine: Machine, polygon: PackedVector2Array, po
 	return st.commit()
 
 # same as above but adds step to y axis to look like a thread stuff idk...
-static func extrudeThreadPolygon(machine: Machine, polygon: PackedVector2Array, pointA: Vector3, pointB: Vector3, step: float) -> ArrayMesh:
+static func extrudeThreadPolygon(machine: Machine, polygon: PackedVector2Array, pointA: Vector3, pointB: Vector3, step: float, existing: ArrayMesh = null) -> ArrayMesh:
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	st.set_smooth_group(-1)
@@ -260,4 +260,4 @@ static func extrudeThreadPolygon(machine: Machine, polygon: PackedVector2Array, 
 	
 	st.generate_normals()
 	
-	return st.commit()
+	return st.commit(existing)

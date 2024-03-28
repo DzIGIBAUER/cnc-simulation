@@ -31,6 +31,10 @@ func _ready():
 
 ## Takes part and tool meshes and projects them to 2D polygons for simulation
 func _project_meshes():
+	# for mesh in machine.chuck.processed_part.meshes:
+	# 	for v in Simulation.projected(machine, machine.chuck.processed_part, mesh):
+	# 		part_poly.append(Vector2(v.x, v.y))
+
 	var	flat_part = Simulation.projected(machine, machine.chuck.processed_part, machine.chuck.processed_part.mesh)	
 	var part_poly = PackedVector2Array()
 	for v in flat_part:
@@ -52,7 +56,11 @@ func reset():
 	
 	Global.machine.tool.tool_mesh_instance.position = tool_starting_position
 
-	# First set mesh and then project it
+	# remove everything to clear the meshes
+	# Global.machine.chuck.processed_part.clear_children()
+
+	
+
 	Global.machine.chuck.processed_part.mesh = base_part_mesh
 	_project_meshes()
 
@@ -292,7 +300,10 @@ func calculate_lathe_thread_result(tool_start: Vector3, tool_end: Vector3) -> Si
 	part_polygon_node.polygon = clipped_part
 	
 	var result = SimulationResult.new()
-	result.mesh = Simulation.extrudeThreadPolygon(machine, cutoff_part, Vector3.DOWN, Vector3.UP, 0.001)
+
+	var existing = Simulation.extrudePartPolygon(machine, cutoff_part, Vector3.DOWN, Vector3.UP)
+	result.mesh = Simulation.extrudeThreadPolygon(machine, cutoff_waste, Vector3.DOWN, Vector3.UP, 0, existing)
+
 	result.waste_mesh = Simulation.extrudePartPolygon(machine, cutoff_waste, Vector3.DOWN, Vector3.UP)
 	result.tool_positions = PackedVector3Array([tool_start, tool_end])
 

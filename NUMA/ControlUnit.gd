@@ -151,7 +151,7 @@ func valid_letters() -> Array[String]:
 func parse_gcode(code: String) -> GCode:
 	var lines = code.split("\n")
 	
-	var gcode = GCode.new()
+	var gcode = GCode.new(code)
 	
 	for line_num in range(lines.size()):
 		var line = lines[line_num].strip_edges()

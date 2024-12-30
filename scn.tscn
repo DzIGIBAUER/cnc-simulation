@@ -6,30 +6,39 @@
 [ext_resource type="Script" path="res://NUMA/Chuck.gd" id="4_2y7ip"]
 [ext_resource type="Script" path="res://lathe/LatheControlUnit.gd" id="4_xyneb"]
 [ext_resource type="Script" path="res://NUMA/Tool.gd" id="5_02rrj"]
-[ext_resource type="Script" path="res://freelook/free_look_camera.gd" id="5_5k5kc"]
 [ext_resource type="Script" path="res://NUMA/SimulationAnimation.gd" id="6_2ro7u"]
 [ext_resource type="Shader" path="res://assets/shaders/waste_shrink.gdshader" id="6_fmmq4"]
 [ext_resource type="AnimationLibrary" uid="uid://bcwmx8ud8kdh5" path="res://ALOBRE.res" id="6_urrk8"]
+[ext_resource type="CylinderMesh" uid="uid://ywvtk3b3i0y8" path="res://part.tres" id="8_qgg2p"]
 [ext_resource type="PackedScene" uid="uid://baabchr6uwr3k" path="res://UI/debug_window/debug_window.tscn" id="9_el36o"]
+[ext_resource type="PackedScene" uid="uid://ctpq25wpfdnxn" path="res://nodes/android/orbit_camera/OrbitCamera.tscn" id="10_xytkb"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_8s6io"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_jqlle"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_73eiv"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_7p21f"]
+[sub_resource type="Sky" id="Sky_k5ex8"]
+sky_material = SubResource("ProceduralSkyMaterial_73eiv")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_au6ag"]
+[sub_resource type="Environment" id="Environment_8qcfe"]
+background_mode = 2
+sky = SubResource("Sky_k5ex8")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7d5bs"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_kt2hb"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4jccn"]
 vertex_color_use_as_albedo = true
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_vggpr"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_30on1"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gsrbg"]
 render_priority = 0
 shader = ExtResource("6_fmmq4")
 shader_parameter/tool_position = null
 shader_parameter/retreat_position = Vector3(0, -1, 0)
 
-[sub_resource type="PrismMesh" id="PrismMesh_twyya"]
+[sub_resource type="PrismMesh" id="PrismMesh_3tve7"]
 
 [sub_resource type="Animation" id="Animation_wl851"]
 length = 0.001
@@ -50,15 +59,6 @@ tracks/0/keys = {
 _data = {
 "RESET": SubResource("Animation_wl851")
 }
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_73eiv"]
-
-[sub_resource type="Sky" id="Sky_k5ex8"]
-sky_material = SubResource("ProceduralSkyMaterial_73eiv")
-
-[sub_resource type="Environment" id="Environment_8qcfe"]
-background_mode = 2
-sky = SubResource("Sky_k5ex8")
 
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_mamcb")
@@ -90,11 +90,26 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.91991, -0.0054704, 0)
 polygon = PackedVector2Array(-0.88104, 0.5, 0.00406122, 0.500106, 0.3964, 0.56542, 0.3964, 0.70361, -0.88104, 0.70361, -0.88104, 0.5)
 depth = 0.01
 
-[node name="Machine" type="Node3D" parent="." node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "machine_zero_point", "reference_point", "chuck", "tool")]
+[node name="Camera2D" type="Camera2D" parent="."]
+visible = false
+offset = Vector2(580, 320)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_8qcfe")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.532842, 0.476635, 0.699213, -0.0914317, -0.789018, 0.607529, 0.841261, -0.387647, -0.376842, 3.23671, 3.83109, -2.02095)
+
+[node name="DebugWindow" parent="." instance=ExtResource("9_el36o")]
+
+[node name="OrbitCamera" parent="." instance=ExtResource("10_xytkb")]
+
+[node name="Machine" type="Node3D" parent="." node_paths=PackedStringArray("simulation_environment", "machine_mesh_instance", "control_unit", "simulation_animation", "machine_zero_point", "reference_point", "chuck", "tool")]
 script = ExtResource("2_2nbhc")
 simulation_environment = NodePath("Node2D")
 machine_mesh_instance = NodePath("MeshInstance3D")
 control_unit = NodePath("LatheControlUnit")
+simulation_animation = NodePath("SimulationAnimation")
 machine_zero_point = NodePath("Node3D")
 reference_point = NodePath("Node3D2")
 chuck = NodePath("Chuck")
@@ -110,42 +125,44 @@ script = ExtResource("3_podgh")
 script = ExtResource("4_xyneb")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Machine"]
-mesh = SubResource("PlaneMesh_jqlle")
+mesh = SubResource("PlaneMesh_7d5bs")
 
 [node name="Node3D" type="Node3D" parent="Machine"]
-transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -1, 0, 0)
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, -0.5, 0, 0)
 
 [node name="Node3D2" type="Node3D" parent="Machine"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.3, 0)
 
 [node name="Chuck" type="Node" parent="Machine" node_paths=PackedStringArray("chuck_mesh_instance", "processed_part", "waste")]
 script = ExtResource("4_2y7ip")
 chuck_mesh_instance = NodePath("MeshInstance3D")
 processed_part = NodePath("MeshInstance3D/Part")
-waste = NodePath("MeshInstance3D/Part/Waste")
+waste = NodePath("MeshInstance3D/Waste")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Machine/Chuck"]
-transform = Transform3D(1.64371e-06, 0.117657, 1.58791e-06, 0.62635, -2.66773e-07, 0.779542, 0.779542, -3.37384e-08, -0.62635, -1, 0.5, 0)
-mesh = SubResource("CylinderMesh_7p21f")
+transform = Transform3D(1.64371e-06, 0.117657, 1.58791e-06, 0.62635, -2.66773e-07, 0.779542, 0.779542, -3.37384e-08, -0.62635, -0.55, 0.15, 0)
+mesh = SubResource("BoxMesh_kt2hb")
 
 [node name="Part" type="MeshInstance3D" parent="Machine/Chuck/MeshInstance3D"]
-transform = Transform3D(0.407242, -1.24345e-14, 2.11758e-22, 9.9476e-14, 5.42869, 5.68434e-14, -2.11758e-21, -3.55271e-14, 0.407242, 2.98023e-08, 6.43976, -6.74154e-08)
-material_override = SubResource("StandardMaterial3D_au6ag")
-mesh = SubResource("CylinderMesh_vggpr")
+transform = Transform3D(1, 1.24345e-13, 0, -1.13687e-13, 1, 1.13687e-13, 0, 4.79616e-14, 1, 0, 1.5, -7.45058e-09)
+material_overlay = SubResource("StandardMaterial3D_4jccn")
+mesh = ExtResource("8_qgg2p")
 
-[node name="Waste" type="MeshInstance3D" parent="Machine/Chuck/MeshInstance3D/Part"]
-material_override = SubResource("ShaderMaterial_30on1")
+[node name="Waste" type="MeshInstance3D" parent="Machine/Chuck/MeshInstance3D"]
+transform = Transform3D(1, 1.38556e-13, 0, -1.13687e-13, 1, 1.02318e-12, 0, 3.55271e-14, 1, 0, 1.5, -7.45058e-09)
+material_override = SubResource("ShaderMaterial_gsrbg")
+skeleton = NodePath("../../../Tool/MeshInstance3D/MeshInstance3D")
 
 [node name="Tool" type="Node" parent="Machine" node_paths=PackedStringArray("tool_mesh_instance", "tool_edge")]
 script = ExtResource("5_02rrj")
 tool_mesh_instance = NodePath("MeshInstance3D")
-tool_edge = NodePath("MeshInstance3D/Node3D")
+tool_edge = NodePath("MeshInstance3D/MeshInstance3D")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Machine/Tool"]
-transform = Transform3D(0.25105, -0.22112, 0, 0.22112, 0.25105, 0, 0, 0, 0.334545, 1, 0.5, 0)
-mesh = SubResource("PrismMesh_twyya")
+transform = Transform3D(0.0598726, -0.0527346, 0, 0.0527346, 0.0598726, 0, 0, 0, 0.0797852, -0.0284823, 0.0922975, 0)
+mesh = SubResource("PrismMesh_3tve7")
 
-[node name="Node3D" type="Node3D" parent="Machine/Tool/MeshInstance3D"]
+[node name="MeshInstance3D" type="Node3D" parent="Machine/Tool/MeshInstance3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="SimulationAnimation" type="AnimationPlayer" parent="Machine" node_paths=PackedStringArray("machine")]
@@ -156,18 +173,7 @@ libraries = {
 script = ExtResource("6_2ro7u")
 machine = NodePath("..")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.15147)
-script = ExtResource("5_5k5kc")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-visible = false
-offset = Vector2(580, 320)
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_8qcfe")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.532842, 0.476635, 0.699213, -0.0914317, -0.789018, 0.607529, 0.841261, -0.387647, -0.376842, 3.23671, 3.83109, -2.02095)
-
-[node name="DebugWindow" parent="." instance=ExtResource("9_el36o")]
+[node name="OrbitCamera" parent="Machine" instance=ExtResource("10_xytkb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.226786, 0.155131, 0)
+rotation_factor = 0.5
+zoom_factor = 0.5

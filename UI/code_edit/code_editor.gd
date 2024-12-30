@@ -1,7 +1,9 @@
+class_name GCodeEditor
 extends VBoxContainer
 
 @export var error_label: Label
 @export var run_button: Button
+@export var code_edit: GCodeEdit
 
 func _on_g_code_edit_errors_changed():
 	if not Global.machine or not Global.machine.gcode: return

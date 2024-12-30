@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://UI/code_edit/code_editor.gd" id="1_1uk5u"]
 [ext_resource type="Script" path="res://UI/code_edit/code_edit.gd" id="1_iygxp"]
 
-[node name="VBoxContainer" type="VBoxContainer" node_paths=PackedStringArray("error_label", "run_button")]
+[node name="VBoxContainer" type="VBoxContainer" node_paths=PackedStringArray("error_label", "run_button", "code_edit")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,8 +12,10 @@ grow_vertical = 2
 script = ExtResource("1_1uk5u")
 error_label = NodePath("PanelContainer/Label")
 run_button = NodePath("PanelContainer/RunButton")
+code_edit = NodePath("GCodeEdit")
 
 [node name="GCodeEdit" type="CodeEdit" parent="." node_paths=PackedStringArray("error_label", "run_button")]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 text = "M03 S500

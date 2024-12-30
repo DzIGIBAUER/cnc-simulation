@@ -1,0 +1,56 @@
+[gd_scene load_steps=4 format=3 uid="uid://caym0djs4hxal"]
+
+[ext_resource type="Script" path="res://UI/project_card/project_card.gd" id="1_18qjq"]
+[ext_resource type="Texture2D" uid="uid://cs3o2whjiiivn" path="res://assets/icons/info.svg" id="2_kk85w"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_7rbw1"]
+font_size = 14
+font_color = Color(0.466181, 0.466181, 0.466181, 1)
+
+[node name="ProjectCard" type="Button"]
+custom_minimum_size = Vector2(0, 100)
+anchors_preset = -1
+anchor_right = 0.347
+anchor_bottom = 0.231
+offset_right = 0.255981
+offset_bottom = 0.311996
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_18qjq")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ProjectName" type="Label" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 6
+text = "save"
+horizontal_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="ProjectPath" type="Label" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "C:\\aaa\\bbb\\ccc\\save.json"
+label_settings = SubResource("LabelSettings_7rbw1")
+clip_text = true
+text_overrun_behavior = 3
+text_direction = 2
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Info"
+icon = ExtResource("2_kk85w")
+flat = true

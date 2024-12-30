@@ -74,6 +74,7 @@ func _ready():
 	# machine.load_gcode("G01 X40 Z100 F0.1")
 	if machine.gcode.valid:
 		machine.run()
+		Project.save()
 	else:
 		print("GCode invalid")
 	

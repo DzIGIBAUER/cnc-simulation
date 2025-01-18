@@ -14,12 +14,13 @@ signal on_state_set(function: ControlUnit.Function)
 @export var camera: Camera3D
 
 @export var machine_zero_point: Node3D
+@export var program_point: Node3D
 @export var reference_point: Node3D
 
 @export var chuck: Chuck
 @export var tool: Tool
 
-const MAX_TOOL_SPEED = 0.5
+const MAX_TOOL_SPEED = 5_000
 
 var workspace: AABB
 
@@ -27,6 +28,12 @@ var gcode: GCode
 
 func _ready():
 	workspace = AABB(machine_zero_point.position, reference_point.position-machine_zero_point.position).abs()
+	
+	# simulation_environment
+
+	# turn machine zero point to local coorinates
+	program_point.position = to_local(machine_zero_point.position)
+	
 	Global.machine = self
 
 # TODO: don't run this all the time
@@ -65,4 +72,3 @@ func run():
 		function.animate(simulation_animation)
 	
 	simulation_animation.play("animation/simulation")
-

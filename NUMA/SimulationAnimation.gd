@@ -34,12 +34,15 @@ func _init_tracks():
 
 	animation.add_track(Animation.TYPE_POSITION_3D, Tracks.TOOL)
 	animation.track_set_path(Tracks.TOOL, "%s:position" % machine.get_path_to(machine.tool.tool_mesh_instance))
+	# animation.track_set_interpolation_type(Tracks.TOOL, Animation.INTERPOLATION_LINEAR)
 	
 	animation.add_track(Animation.TYPE_VALUE, Tracks.PART)
 	animation.track_set_path(Tracks.PART, "%s:mesh" % machine.get_path_to(machine.chuck.processed_part))
 
 	animation.add_track(Animation.TYPE_VALUE, Tracks.WASTE)
 	animation.track_set_path(Tracks.WASTE, "%s:mesh" % machine.get_path_to(machine.chuck.waste))
+
+	animation.length = 0
 
 ## Resets animation to clean state with all track present
 func clear_animations():

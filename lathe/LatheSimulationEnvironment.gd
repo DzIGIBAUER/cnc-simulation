@@ -17,7 +17,6 @@ var part_material: Material
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	
 	_project_meshes()
 
 	# var dw: DebugWindow = machine.get_node("../DebugWindow")
@@ -54,12 +53,28 @@ func _project_meshes():
 func reset():
 	Global.machine.simulation_animation.clear_animations()
 	
-	Global.machine.tool.tool_mesh_instance.position = tool_starting_position
+	Global.machine.simulation_animation.animation.track_insert_key(
+		Global.machine.simulation_animation.Tracks.PART,
+		0,
+		base_part_mesh,
+		0
+	)
+
+	# Global.machine.tool.tool_mesh_instance.position = Global.machine.tool.tool_mesh_starting_position
+
+	Global.machine.tool.tool_mesh_instance.position = Global.machine.reference_point.position
+	
+	print(Global.machine.tool.tool_mesh_instance.position)
+
+	Global.machine.simulation_animation.animation.position_track_insert_key(
+		Global.machine.simulation_animation.Tracks.TOOL,
+		0,
+		Global.machine.reference_point.position
+	)
 
 	# remove everything to clear the meshes
 	# Global.machine.chuck.processed_part.clear_children()
 
-	
 
 	Global.machine.chuck.processed_part.mesh = base_part_mesh
 	_project_meshes()
@@ -120,6 +135,10 @@ func calculate_lathe_linear_interpolation_result(tool_start: Vector3, tool_end: 
 	item = DebugItem.new()
 	item.polygons = [clipped_waste]
 	dw.add_debug_item("Waste BRE", item)
+	
+	item = DebugItem.new()
+	item.polygons = [cutoff_part]
+	dw.add_debug_item("Cutoff Part", item)
 
 	tool_polygon_node.polygon = displaced_tool_poly
 	part_polygon_node.polygon = clipped_part
@@ -138,16 +157,25 @@ func calculate_lathe_circular_interpolation_result(tool_start: Vector3, tool_end
 	var tool_start_2d = Vector2(tool_start.x, tool_start.y)
 	var tool_end_2d = Vector2(tool_end.x, tool_end.y)
 
-	
-	var center = calculate_center_point_r(tool_start_2d, tool_end_2d, radius)
+	print("tool_start: ", tool_start)
+	print("tool_end: ", tool_end)
 
-	# print(tool_start, tool_end, center)
+	var dw = Global.debug_window
+	var item = DebugItem.new()
+	
+	var center = calculate_center_point_r(tool_start_2d, tool_end_2d, radius, clockwise)
+
+	prints("CIRCLE:", tool_start, tool_end, center)
 	
 	var circle_points = calculate_circle_points(tool_start_2d, tool_end_2d, center, clockwise)
 
 	var extruded_tool_poly = tool_polygon_node.polygon
 	for point in circle_points:
 		extruded_tool_poly = Simulation.extrude(extruded_tool_poly, 0, point)
+
+	item = DebugItem.new()
+	item.polygons = [tool_polygon_node.polygon, part_polygon_node.polygon]
+	dw.add_debug_item("Displaced, Before", item)
 
 	var displaced_tool_poly = Simulation.displace(tool_polygon_node.polygon, 0, tool_end_2d)
 
@@ -182,11 +210,13 @@ func calculate_lathe_circular_interpolation_result(tool_start: Vector3, tool_end
 	part_polygon_node.polygon = clipped_part
 
 
-	var dw = Global.debug_window
-
-	var item = DebugItem.new()
+	item = DebugItem.new()
 	item.polygons = [part_polygon_node.polygon, extruded_tool_poly]
 	dw.add_debug_item("Extruded", item)
+	
+	item = DebugItem.new()
+	item.polygons = [displaced_tool_poly, part_polygon_node.polygon]
+	dw.add_debug_item("Displaced", item)
 	
 	item = DebugItem.new()
 	item.polygons = [Utils.generate_circle_polygon(radius, 360, center)]
@@ -195,6 +225,10 @@ func calculate_lathe_circular_interpolation_result(tool_start: Vector3, tool_end
 	item = DebugItem.new()
 	item.polygons = [clipped_waste, cutoff_waste]
 	dw.add_debug_item("Circle Waste", item)
+
+	item = DebugItem.new()
+	item.polygons = [cutoff_part]
+	dw.add_debug_item("Circle Cutoff Part", item)
 
 	var result = SimulationResult.new()
 	result.mesh = Simulation.extrudePartPolygon(machine, cutoff_part, Vector3.DOWN, Vector3.UP)
@@ -209,39 +243,57 @@ func calculate_lathe_circular_interpolation_result(tool_start: Vector3, tool_end
 	return result
 
 
-func calculate_center_point_r(start: Vector2, end: Vector2, radius: float) -> Vector2:
-	var midpoint = Vector2((start.x + end.x)/2.0, (start.y + end.y)/2.0)
-
-	var M = (end-midpoint)
-
-	# var m = M.rotated(deg_to_rad(90 if clockwise else -90))
-	var m = M.rotated(deg_to_rad(90)) + midpoint
-
-	var d = sqrt(pow(radius, 2) - midpoint.distance_squared_to(end))
-
-	# prints(start, end)
-	# prints("alo", M, m, d, (Vector2.ZERO.direction_to(m-midpoint)*d)+midpoint )
-
-	return (midpoint + midpoint.direction_to(m)*d)
+func calculate_center_point_r(start: Vector2, end: Vector2, radius: float, clockwise: bool = true) -> Vector2:
+	var midpoint = (start + end) / 2.0
+	var d = start.distance_to(end)
+	
+	if abs(radius) < d/2:
+		push_error("Radius too small")
+		return midpoint
+		
+	var h = sqrt(pow(abs(radius), 2) - pow(d/2, 2))
+	var direction = (end - start).rotated(PI/2).normalized()
+	
+	if (radius < 0 and clockwise) or (radius > 0 and not clockwise):
+		direction = -direction
+		
+	return midpoint + direction * h
 
 
 func calculate_circle_points(start: Vector2, end: Vector2, center: Vector2, clockwise: bool = true) -> PackedVector2Array:
 	var circle_points = PackedVector2Array()
-
-	var degrees = Utils.angle_difference(rad_to_deg(center.angle_to_point(end)), rad_to_deg(center.angle_to_point(start)))
-
-	degrees = degrees if clockwise else -degrees
-
-	# print("degrees: %s, Start: %s, end: %s" % [degrees, rad_to_deg(center.angle_to_point(start)), rad_to_deg(center.angle_to_point(end))])
+	var radius = center.distance_to(start)
 	
-	circle_points.append(start)
-
-	for i in range(1, degrees+1, int(signf(degrees))):
-		var point = (start - center).rotated(deg_to_rad(i)) + center
+	# Make points relative to center
+	var rel_start = start - center
+	var rel_end = end - center
+	
+	var angle = rel_start.angle_to(rel_end)
+	if (clockwise and angle < 0) or (not clockwise and angle > 0):
+		angle = -angle
+		
+	var angle_step = 0.1
+	var steps = int(angle / angle_step)
+	
+	for i in range(steps + 1):
+		var step_angle = angle * (float(i) / steps)
+		var point = rel_start.rotated(step_angle) + center
 		circle_points.append(point)
-
-	circle_points.append(end)
 	
+
+	var poly_string: String = ""
+	for p in circle_points:
+		if not poly_string.is_empty():
+			poly_string += ","	
+		
+		poly_string += "(%s, %s)" % [p.x, p.y]
+
+	print(rel_start.angle())
+	print(rel_end.angle())
+
+	print(start)
+	print(end)
+	print("polygon(%s)" % poly_string)
 
 	return circle_points
 

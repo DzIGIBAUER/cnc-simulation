@@ -83,6 +83,9 @@ func _process_function_block(function: Function) -> Block:
 		updated_block = _fill_in_missing_parameter(previous_functions, function.block, "Z", FunctionCategory.MOTION)
 		processed_block.params.merge(updated_block.params)
 
+		updated_block = _fill_in_missing_parameter(previous_functions, function.block, "F", FunctionCategory.MOTION)
+		processed_block.params.merge(updated_block.params)
+
 	# Convert to millimeters if inches are used in GCode and we have a motion function
 	# Not sure if there are any other parameters that are affected by selected unit
 	if selected_unit == Unit.INCHES and function.category == FunctionCategory.MOTION:

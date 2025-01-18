@@ -1,0 +1,5 @@
+<svg viewBox="-10 -10 20 20" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="0" cy="0" r="8" stroke="black" stroke-width="1" fill="none"/>
+    <line x1="-8" y1="0" x2="8" y2="0" stroke="black" stroke-width="1"/>
+    <line x1="0" y1="-8" x2="0" y2="8" stroke="black" stroke-width="1"/>
+</svg>
